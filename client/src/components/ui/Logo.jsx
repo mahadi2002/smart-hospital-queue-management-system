@@ -1,7 +1,4 @@
-/**
- * Heart-outline + heartbeat/pulse-line combined mark.
- * Thin-stroke style matching the rest of the app's iconography (lucide-react).
- */
+// Heart outline + pulse line, drawn by hand to match the lucide-react icon style used everywhere else.
 export default function Logo({ size = 32, color = 'currentColor', className = '' }) {
   return (
     <svg

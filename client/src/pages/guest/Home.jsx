@@ -30,9 +30,9 @@ export default function Home() {
                 Skip the wait. Get in line before you leave home.
               </h1>
               <p className="mb-4" style={{ fontSize: '1.05rem', opacity: 0.9 }}>
-                Martyr Sharif Osman Bin Hadi Hospital's Smart Hospital Queue Management System
-                lets you book a token, track your position live, and see the right specialist —
-                without standing in a physical line.
+                Book a token from home, check your position from your phone, and walk in only when
+                your turn is close. No more sitting in a waiting room for two hours to find out
+                you're patient number 40.
               </p>
               <div className="d-flex gap-3 flex-wrap">
                 <button className="btn btn-light btn-lg fw-semibold" onClick={() => setBookingOpen(true)}>
@@ -71,15 +71,15 @@ export default function Home() {
           {specialties.map((s) => (
             <div className="col-6 col-md-4 col-lg-3" key={s.id}>
               <Link to={`/doctors?specialty=${s.id}`} className="text-decoration-none text-body">
-                <Card className="h-100 text-center py-4" style={{ cursor: 'pointer' }}>
+                <Card className="h-100 text-center py-5" style={{ cursor: 'pointer' }}>
                   <div
-                    className="mx-auto mb-2 d-flex align-items-center justify-content-center"
-                    style={{ width: 48, height: 48, borderRadius: '50%', background: 'rgba(163,38,56,0.1)', color: '#a32638' }}
+                    className="mx-auto mb-3 d-flex align-items-center justify-content-center"
+                    style={{ width: 64, height: 64, borderRadius: '50%', background: 'rgba(163,38,56,0.1)', color: '#a32638' }}
                   >
-                    <Icon name={s.icon} size={22} />
+                    <Icon name={s.icon} size={30} />
                   </div>
-                  <div className="fw-semibold">{s.name}</div>
-                  <div className="text-shq-secondary small">
+                  <div className="fw-semibold fs-5">{s.name}</div>
+                  <div className="text-shq-secondary">
                     {getDoctorsBySpecialty(s.id).length} doctors · ~{s.consultMinutes} min
                   </div>
                 </Card>

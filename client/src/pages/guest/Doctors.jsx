@@ -40,7 +40,7 @@ export default function Doctors() {
   return (
     <div className="container py-5">
       <h1 className="fw-bold h3 mb-1">Our Doctors</h1>
-      <p className="text-shq-secondary mb-4">Browse specialists and book a token instantly — no account required.</p>
+      <p className="text-shq-secondary mb-4">You don't need an account to book. Just pick a doctor below.</p>
 
       <div className="d-flex gap-2 flex-wrap mb-4">
         <button

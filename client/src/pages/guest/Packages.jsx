@@ -12,8 +12,8 @@ export default function Packages() {
     <div className="container py-5">
       <h1 className="fw-bold h3 mb-1">Health Packages</h1>
       <p className="text-shq-secondary mb-4">
-        Preventive checkup bundles designed by our specialists — reserve one and our team will
-        call you to confirm and schedule your visit.
+        Reserve a package below and leave your phone number. Someone from our team will call you
+        back to confirm a date and walk you through what's included.
       </p>
 
       <div className="row g-3">

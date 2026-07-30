@@ -2,10 +2,10 @@ import Card from '../../components/ui/Card'
 import { HeartHandshake, ShieldCheck, Users, Clock } from 'lucide-react'
 
 const VALUES = [
-  { icon: HeartHandshake, title: 'Compassionate Care', text: 'Every patient is treated with dignity, regardless of background or circumstance.' },
-  { icon: ShieldCheck, title: 'Transparency', text: 'Clear queue positions, honest wait estimates, and no hidden priority.' },
-  { icon: Users, title: 'Accessibility', text: 'Guest booking, multi-language support, and no-account options for urgent visits.' },
-  { icon: Clock, title: 'Efficiency', text: 'A queue system designed to respect patients\' time as much as their health.' },
+  { icon: HeartHandshake, title: 'Compassionate Care', text: 'Whether you\'ve been coming here for years or you just walked in off the street, you get treated the same way.' },
+  { icon: ShieldCheck, title: 'Transparency', text: 'You can check your token number and wait time from your phone instead of asking the front desk every twenty minutes.' },
+  { icon: Users, title: 'Accessibility', text: 'No account needed to book. If it\'s urgent, just give your name and phone number at the counter.' },
+  { icon: Clock, title: 'Efficiency', text: 'Doctors run consultations at their own pace, and the queue adjusts around that instead of pretending everyone gets exactly ten minutes.' },
 ]
 
 export default function About() {
@@ -14,8 +14,9 @@ export default function About() {
       <h1 className="fw-bold h3 mb-3">About Us</h1>
 
       <p className="mb-3">
-        Martyr Sharif Osman Bin Hadi Hospital is a community hospital committed to accessible,
-        dignified healthcare for every patient who walks through our doors.
+        Martyr Sharif Osman Bin Hadi Hospital is a specialist outpatient center in Dhaka —
+        consultations, diagnostics, and day procedures across eight departments. Most people who
+        visit us are here to see a specialist or get lab work done, not for a long inpatient stay.
       </p>
 
       <p className="text-shq-secondary mb-4">
@@ -25,10 +26,10 @@ export default function About() {
 
       <h2 className="fw-bold h5 mb-3">Our Mission</h2>
       <p className="mb-4">
-        To make quality healthcare predictable and stress-free — starting with how patients wait
-        to see a doctor. The Smart Hospital Queue Management System removes the uncertainty of
-        physical queues, giving patients control over their time without compromising care quality
-        or fairness.
+        The waiting room is usually the worst part of a hospital visit, not the appointment itself.
+        You just don't know how long you'll be sitting there. That's the one problem this system
+        is built to solve: you get a token, you can see where you actually are in line, and you
+        show up when it's close to your turn instead of two hours early just in case.
       </p>
 
       <h2 className="fw-bold h5 mb-3">What We Value</h2>

@@ -35,7 +35,7 @@ export default function Sidebar({ role, onOpenSupport, mobileOpen, onClose }) {
               onClick={onClose}
               className={({ isActive }) => `${styles.navLink} ${isActive ? styles.navLinkActive : ''}`}
             >
-              <Icon name={item.icon} size={18} />
+              <Icon name={item.icon} size={20} />
               {item.label}
             </NavLink>
           ))}
