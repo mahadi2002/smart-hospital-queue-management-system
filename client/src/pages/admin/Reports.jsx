@@ -1,7 +1,11 @@
-import { FileBarChart, Download, FileSpreadsheet } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { FileBarChart, Download, FileSpreadsheet, Phone } from 'lucide-react'
 import Card from '../../components/ui/Card'
+import api from '../../services/api'
+import { normalizePackageReservation } from '../../services/normalize'
 import { useQueue } from '../../context/QueueContext'
 import { useDirectory } from '../../context/DirectoryContext'
+import { formatDateTime } from '../../utils/format'
 import { showToast } from '../../utils/toast'
 import { TOKEN_STATUS } from '../../constants/tokenStatus'
 
@@ -14,6 +18,11 @@ const REPORT_TYPES = [
 export default function Reports() {
   const { tokens } = useQueue()
   const { doctors } = useDirectory()
+  const [reservations, setReservations] = useState([])
+
+  useEffect(() => {
+    api.get('/packages/reservations').then(({ data }) => setReservations(data.map(normalizePackageReservation)))
+  }, [])
 
   function handleGenerate(report) {
     showToast(`${report.name} generated.`)
@@ -55,7 +64,7 @@ export default function Reports() {
         </div>
       </div>
 
-      <div className="d-flex flex-column gap-3">
+      <div className="d-flex flex-column gap-3 mb-4">
         {REPORT_TYPES.map((r) => (
           <Card key={r.id}>
             <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
@@ -81,7 +90,48 @@ export default function Reports() {
         ))}
       </div>
 
-      <div className="text-shq-secondary small mt-3">{doctors.length} doctors included in reporting scope.</div>
+      <h2 className="h6 fw-bold mb-3">Health Package Reservations ({reservations.length})</h2>
+      <p className="text-shq-secondary small mb-3">
+        Contact details left by guests and patients reserving a health package — call them to confirm and schedule.
+      </p>
+      {reservations.length === 0 ? (
+        <p className="text-shq-secondary">No reservations yet.</p>
+      ) : (
+        <Card className="p-0 mb-4">
+          <div className="table-responsive">
+            <table className="table mb-0 align-middle">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Phone</th>
+                  <th>Package</th>
+                  <th>Reserved</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {reservations.map((r) => (
+                  <tr key={r.id}>
+                    <td className="fw-semibold">{r.name}</td>
+                    <td>
+                      <a href={`tel:${r.phone}`} className="link-shq d-inline-flex align-items-center gap-1">
+                        <Phone size={13} /> {r.phone}
+                      </a>
+                    </td>
+                    <td className="text-shq-secondary small">{r.packageName}</td>
+                    <td className="text-shq-secondary small">{formatDateTime(r.createdAt)}</td>
+                    <td>
+                      <span className="badge bg-warning-subtle text-warning-emphasis text-capitalize">{r.status}</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      )}
+
+      <div className="text-shq-secondary small">{doctors.length} doctors included in reporting scope.</div>
     </div>
   )
 }

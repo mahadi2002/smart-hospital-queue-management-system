@@ -36,7 +36,9 @@ import DoctorProfile from './pages/doctor/Profile'
 import AdminDashboard from './pages/admin/Dashboard'
 import AdminDoctors from './pages/admin/Doctors'
 import AdminPatients from './pages/admin/Patients'
+import AdminPatientDetail from './pages/admin/PatientDetail'
 import AdminSpecialties from './pages/admin/Specialties'
+import Admins from './pages/admin/Admins'
 import TokenConfig from './pages/admin/TokenConfig'
 import Reports from './pages/admin/Reports'
 import Analytics from './pages/admin/Analytics'
@@ -94,7 +96,9 @@ function App() {
                 <Route path="dashboard" element={<AdminDashboard />} />
                 <Route path="doctors" element={<AdminDoctors />} />
                 <Route path="patients" element={<AdminPatients />} />
+                <Route path="patients/:patientId" element={<AdminPatientDetail />} />
                 <Route path="specialties" element={<AdminSpecialties />} />
+                <Route path="admins" element={<Admins />} />
                 <Route path="token-config" element={<TokenConfig />} />
                 <Route path="reports" element={<Reports />} />
                 <Route path="analytics" element={<Analytics />} />

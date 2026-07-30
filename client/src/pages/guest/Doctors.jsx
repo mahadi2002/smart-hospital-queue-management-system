@@ -17,13 +17,19 @@ export default function Doctors() {
   const [queueStatus, setQueueStatus] = useState({})
 
   useEffect(() => {
-    api.get('/doctors/queue-status').then(({ data }) => {
-      const byDoctorId = {}
-      data.map(normalizeQueueStatus).forEach((q) => {
-        byDoctorId[q.doctorId] = q
+    function loadQueueStatus() {
+      api.get('/doctors/queue-status').then(({ data }) => {
+        const byDoctorId = {}
+        data.map(normalizeQueueStatus).forEach((q) => {
+          byDoctorId[q.doctorId] = q
+        })
+        setQueueStatus(byDoctorId)
       })
-      setQueueStatus(byDoctorId)
-    })
+    }
+    loadQueueStatus()
+    // Poll so a new booking (by this guest or anyone else) shows up here live.
+    const interval = setInterval(loadQueueStatus, 8000)
+    return () => clearInterval(interval)
   }, [])
 
   const filtered = useMemo(

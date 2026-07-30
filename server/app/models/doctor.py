@@ -9,6 +9,9 @@ class DoctorCreate(BaseModel):
     email: EmailStr
     phone: str
     password: str | None = None  # admin can leave blank to use the default demo password
+    consultation_fee: int | None = None
+    languages: list[str] | None = None
+    room_number: str | None = None
 
 
 class DoctorLogin(BaseModel):
@@ -21,6 +24,9 @@ class DoctorUpdate(BaseModel):
     phone: str | None = None
     working_hours: str | None = None
     bio: str | None = None
+    consultation_fee: int | None = None
+    languages: list[str] | None = None
+    room_number: str | None = None
 
 
 class DoctorOut(BaseModel):
@@ -39,3 +45,6 @@ class DoctorOut(BaseModel):
     status: str
     bio: str
     queue_paused: bool = False
+    consultation_fee: int = 0
+    languages: list[str] = []
+    room_number: str = ""

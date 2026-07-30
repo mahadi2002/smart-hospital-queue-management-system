@@ -1,10 +1,21 @@
 import { Link } from 'react-router-dom'
-import { Search, Bell } from 'lucide-react'
+import { Search, Bell, Menu } from 'lucide-react'
 import styles from './Topbar.module.css'
 
-export default function Topbar({ profileName, profileRole, avatarInitials, notificationsPath, unreadCount = 0, profilePath }) {
+export default function Topbar({
+  profileName,
+  profileRole,
+  avatarInitials,
+  notificationsPath,
+  unreadCount = 0,
+  profilePath,
+  onOpenSidebar,
+}) {
   return (
     <header className={styles.topbar}>
+      <button type="button" className={styles.menuToggle} onClick={onOpenSidebar} aria-label="Open menu">
+        <Menu size={22} />
+      </button>
       <div className={styles.search}>
         <Search size={16} />
         <input type="text" placeholder="Search..." aria-label="Search" />

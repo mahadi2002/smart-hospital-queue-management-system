@@ -30,7 +30,7 @@ export default function GuestHeader() {
       </nav>
 
       <div className={styles.actions}>
-        <Link to="/login/patient" className={`btn btn-outline-primary btn-sm ${styles.navLink}`}>
+        <Link to="/login/patient" className="btn btn-outline-primary btn-sm">
           Login
         </Link>
         <Link to="/register" className="btn btn-primary btn-sm">

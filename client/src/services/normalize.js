@@ -20,6 +20,23 @@ export function normalizeDoctor(d) {
     status: d.status,
     bio: d.bio,
     queuePaused: d.queue_paused,
+    consultationFee: d.consultation_fee,
+    languages: d.languages || [],
+    roomNumber: d.room_number,
+  }
+}
+
+export function normalizePackageReservation(r) {
+  return {
+    id: r.id,
+    packageId: r.package_id,
+    packageName: r.package_name,
+    name: r.name,
+    phone: r.phone,
+    email: r.email,
+    patientId: r.patient_id,
+    status: r.status,
+    createdAt: r.created_at,
   }
 }
 
@@ -64,6 +81,9 @@ export function normalizeAdmin(a) {
     email: a.email,
     role: a.role,
     avatarInitials: a.avatar_initials,
+    phone: a.phone,
+    department: a.department,
+    joinDate: a.join_date,
   }
 }
 

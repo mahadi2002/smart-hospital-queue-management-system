@@ -10,6 +10,7 @@ export default function DashboardLayout({ role }) {
   const { session, isAuthenticated, profile, loading } = useAuth()
   const { unreadCount } = useNotifications()
   const [supportOpen, setSupportOpen] = useState(false)
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
 
   if (loading) {
     return null
@@ -25,7 +26,12 @@ export default function DashboardLayout({ role }) {
 
   return (
     <div className="shq-app-shell">
-      <Sidebar role={role} onOpenSupport={() => setSupportOpen(true)} />
+      <Sidebar
+        role={role}
+        onOpenSupport={() => setSupportOpen(true)}
+        mobileOpen={mobileSidebarOpen}
+        onClose={() => setMobileSidebarOpen(false)}
+      />
       <div className="shq-main-column">
         <Topbar
           profileName={profile?.name || 'User'}
@@ -34,6 +40,7 @@ export default function DashboardLayout({ role }) {
           notificationsPath={`/${role}/notifications`}
           profilePath={`/${role}/profile`}
           unreadCount={unreadCount()}
+          onOpenSidebar={() => setMobileSidebarOpen(true)}
         />
         <main className="shq-content">
           <Outlet />

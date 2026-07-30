@@ -15,7 +15,10 @@ export function NotificationsProvider({ children }) {
   }, [])
 
   useEffect(() => {
-    if (isAuthenticated) refetch()
+    if (!isAuthenticated) return
+    refetch()
+    const interval = setInterval(refetch, 10000)
+    return () => clearInterval(interval)
   }, [isAuthenticated, refetch])
 
   // role/profileId are kept in the signature so call sites don't need to

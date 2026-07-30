@@ -22,6 +22,7 @@ export const NAV_ITEMS = {
     { label: 'Doctors', path: '/admin/doctors', icon: 'Stethoscope' },
     { label: 'Patients', path: '/admin/patients', icon: 'Users' },
     { label: 'Specialties', path: '/admin/specialties', icon: 'Layers' },
+    { label: 'Admins', path: '/admin/admins', icon: 'ShieldCheck' },
     { label: 'Token Config', path: '/admin/token-config', icon: 'SlidersHorizontal' },
     { label: 'Reports', path: '/admin/reports', icon: 'FileBarChart' },
     { label: 'Analytics', path: '/admin/analytics', icon: 'PieChart' },

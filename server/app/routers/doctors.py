@@ -85,6 +85,9 @@ async def create_doctor(payload: DoctorCreate):
         "status": "active",
         "bio": "",
         "queue_paused": False,
+        "consultation_fee": payload.consultation_fee or 500,
+        "languages": payload.languages or ["Bengali", "English"],
+        "room_number": payload.room_number or "",
     }
     result = await doctors_col.insert_one(doctor)
     doc = await doctors_col.find_one({"_id": result.inserted_id})

@@ -70,18 +70,20 @@ export default function Home() {
         <div className="row g-3">
           {specialties.map((s) => (
             <div className="col-6 col-md-4 col-lg-3" key={s.id}>
-              <Card className="h-100 text-center py-4">
-                <div
-                  className="mx-auto mb-2 d-flex align-items-center justify-content-center"
-                  style={{ width: 48, height: 48, borderRadius: '50%', background: 'rgba(163,38,56,0.1)', color: '#a32638' }}
-                >
-                  <Icon name={s.icon} size={22} />
-                </div>
-                <div className="fw-semibold">{s.name}</div>
-                <div className="text-shq-secondary small">
-                  {getDoctorsBySpecialty(s.id).length} doctors · ~{s.consultMinutes} min
-                </div>
-              </Card>
+              <Link to={`/doctors?specialty=${s.id}`} className="text-decoration-none text-body">
+                <Card className="h-100 text-center py-4" style={{ cursor: 'pointer' }}>
+                  <div
+                    className="mx-auto mb-2 d-flex align-items-center justify-content-center"
+                    style={{ width: 48, height: 48, borderRadius: '50%', background: 'rgba(163,38,56,0.1)', color: '#a32638' }}
+                  >
+                    <Icon name={s.icon} size={22} />
+                  </div>
+                  <div className="fw-semibold">{s.name}</div>
+                  <div className="text-shq-secondary small">
+                    {getDoctorsBySpecialty(s.id).length} doctors · ~{s.consultMinutes} min
+                  </div>
+                </Card>
+              </Link>
             </div>
           ))}
         </div>
@@ -144,13 +146,15 @@ export default function Home() {
         <div className="row g-3">
           {packages.slice(0, 3).map((p) => (
             <div className="col-md-4" key={p.id}>
-              <Card className="h-100">
-                <div className="fw-semibold mb-1">{p.name}</div>
-                <div className="text-shq-secondary small mb-2">{p.description}</div>
-                <div className="fw-bold" style={{ color: 'var(--shq-green)' }}>
-                  ৳{p.price.toLocaleString()}
-                </div>
-              </Card>
+              <Link to="/packages" className="text-decoration-none text-body">
+                <Card className="h-100" style={{ cursor: 'pointer' }}>
+                  <div className="fw-semibold mb-1">{p.name}</div>
+                  <div className="text-shq-secondary small mb-2">{p.description}</div>
+                  <div className="fw-bold" style={{ color: 'var(--shq-green)' }}>
+                    ৳{p.price.toLocaleString()}
+                  </div>
+                </Card>
+              </Link>
             </div>
           ))}
         </div>

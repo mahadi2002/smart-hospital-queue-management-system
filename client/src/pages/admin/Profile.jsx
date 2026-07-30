@@ -5,7 +5,7 @@ import ChangePasswordModal from '../../components/shared/ChangePasswordModal'
 import DeactivateAccountModal from '../../components/shared/DeactivateAccountModal'
 import api from '../../services/api'
 import { useAuth } from '../../context/AuthContext'
-import { getInitials } from '../../utils/format'
+import { getInitials, formatDate } from '../../utils/format'
 import { showToast } from '../../utils/toast'
 
 export default function AdminProfile() {
@@ -13,10 +13,16 @@ export default function AdminProfile() {
   const [changePasswordOpen, setChangePasswordOpen] = useState(false)
   const [deactivateOpen, setDeactivateOpen] = useState(false)
 
-  const { register, handleSubmit } = useForm({ defaultValues: { name: admin.name } })
+  const { register, handleSubmit } = useForm({
+    defaultValues: { name: admin.name, phone: admin.phone, department: admin.department },
+  })
 
   async function onSubmit(data) {
-    await api.patch(`/admins/${session.profileId}`, { name: data.name })
+    await api.patch(`/admins/${session.profileId}`, {
+      name: data.name,
+      phone: data.phone,
+      department: data.department,
+    })
     await refreshProfile()
     showToast('Changes saved.')
   }
@@ -29,17 +35,31 @@ export default function AdminProfile() {
         <div className="col-lg-8">
           <Card>
             <form onSubmit={handleSubmit(onSubmit)}>
-              <div className="mb-3">
-                <label className="form-label">Full Name</label>
-                <input className="form-control" {...register('name')} />
-              </div>
-              <div className="mb-3">
-                <label className="form-label">Email</label>
-                <input className="form-control" value={admin.email} disabled />
-              </div>
-              <div className="mb-3">
-                <label className="form-label">Role</label>
-                <input className="form-control" value={admin.role} disabled />
+              <div className="row">
+                <div className="col-md-6 mb-3">
+                  <label className="form-label">Full Name</label>
+                  <input className="form-control" {...register('name')} />
+                </div>
+                <div className="col-md-6 mb-3">
+                  <label className="form-label">Email</label>
+                  <input className="form-control" value={admin.email} disabled />
+                </div>
+                <div className="col-md-6 mb-3">
+                  <label className="form-label">Phone</label>
+                  <input className="form-control" {...register('phone')} />
+                </div>
+                <div className="col-md-6 mb-3">
+                  <label className="form-label">Department</label>
+                  <input className="form-control" {...register('department')} />
+                </div>
+                <div className="col-md-6 mb-3">
+                  <label className="form-label">Role</label>
+                  <input className="form-control" value={admin.role} disabled />
+                </div>
+                <div className="col-md-6 mb-3">
+                  <label className="form-label">Joined</label>
+                  <input className="form-control" value={formatDate(admin.joinDate) || '—'} disabled />
+                </div>
               </div>
               <button type="submit" className="btn btn-primary">
                 Save Changes
@@ -58,6 +78,9 @@ export default function AdminProfile() {
             </div>
             <div className="fw-semibold">{admin.name}</div>
             <div className="text-shq-secondary small">{admin.role}</div>
+            <div className="text-shq-secondary small">{admin.department}</div>
+            <div className="text-shq-secondary small">{admin.phone}</div>
+            <div className="text-shq-secondary small">Joined {formatDate(admin.joinDate)}</div>
           </Card>
 
           <Card>

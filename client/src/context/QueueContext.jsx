@@ -37,7 +37,12 @@ export function QueueProvider({ children }) {
   }
 
   useEffect(() => {
-    if (isAuthenticated) refetchTokens()
+    if (!isAuthenticated) return
+    refetchTokens()
+    // Poll so a booking made by someone else (a guest, another tab, another
+    // patient) shows up here without needing a manual refresh.
+    const interval = setInterval(refetchTokens, 6000)
+    return () => clearInterval(interval)
   }, [isAuthenticated, refetchTokens])
 
   function sortQueue(list) {

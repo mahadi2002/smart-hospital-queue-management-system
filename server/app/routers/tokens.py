@@ -27,9 +27,9 @@ async def list_tokens(
     current_user: dict = Depends(get_current_user),
 ):
     if current_user["role"] == "patient":
-        patient_id = current_user["id"]
-    elif current_user["role"] == "doctor":
-        doctor_id = current_user["id"]
+        patient_id = current_user["id"]  # patients can only ever see their own tokens
+    elif current_user["role"] == "doctor" and not patient_id:
+        doctor_id = current_user["id"]  # own queue by default; explicit patient_id looks up that patient's full history
     # admin can pass either filter or neither
 
     query = {}

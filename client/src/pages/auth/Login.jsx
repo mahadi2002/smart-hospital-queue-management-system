@@ -7,12 +7,6 @@ import RoleTabs from '../../components/auth/RoleTabs'
 import ForgotPasswordModal from '../../components/auth/ForgotPasswordModal'
 import { useAuth } from '../../context/AuthContext'
 
-const DEMO_CREDENTIALS = {
-  patient: { email: 'abdullah.mamun@example.com', password: 'password123' },
-  doctor: { email: 'farhana.kabir@moh-hospital.example', password: 'doctor123' },
-  admin: { email: 'admin@moh-hospital.example', password: 'admin123' },
-}
-
 export default function Login({ role }) {
   const { loginPatient, loginDoctor, loginAdmin } = useAuth()
   const navigate = useNavigate()
@@ -44,12 +38,9 @@ export default function Login({ role }) {
 
         <RoleTabs />
 
-        <h1 className="h4 fw-bold text-center mb-1">
+        <h1 className="h4 fw-bold text-center mb-4">
           {role === 'patient' ? 'Patient Login' : role === 'doctor' ? 'Doctor Login' : 'Admin Login'}
         </h1>
-        <p className="text-shq-secondary small text-center mb-4">
-          Demo: {DEMO_CREDENTIALS[role].email} / {DEMO_CREDENTIALS[role].password}
-        </p>
 
         {serverError && <div className="alert alert-danger py-2 small">{serverError}</div>}
 

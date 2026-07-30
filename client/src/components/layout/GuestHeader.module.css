@@ -79,7 +79,11 @@
   .menuToggle {
     display: flex;
   }
-  .actions .navLink {
-    display: none;
+  .actions {
+    gap: 8px;
+  }
+  .actions .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.78rem;
   }
 }

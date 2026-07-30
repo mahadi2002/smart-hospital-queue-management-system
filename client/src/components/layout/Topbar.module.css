@@ -20,6 +20,20 @@
   }
 }
 
+.menuToggle {
+  display: none;
+  border: none;
+  background: none;
+  color: var(--shq-text);
+  flex-shrink: 0;
+}
+
+@media (max-width: 991px) {
+  .menuToggle {
+    display: flex;
+  }
+}
+
 .search {
   display: flex;
   align-items: center;
