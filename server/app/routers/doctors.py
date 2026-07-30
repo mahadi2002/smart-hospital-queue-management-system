@@ -2,6 +2,7 @@ from bson import ObjectId
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.core.deps import get_current_user, require_role
+from app.core.queue_rules import expire_overdue_calls
 from app.core.security import hash_password
 from app.core.serializers import serialize_doc, serialize_list
 from app.database import doctors_col, specialties_col, tokens_col
@@ -30,6 +31,8 @@ async def queue_status_all():
     currently seeing, how many are waiting, and how long a new booking
     would take right now (waiting_count * consult_minutes, plus one more
     consult if someone is already being seen)."""
+    await expire_overdue_calls()
+
     docs = await doctors_col.find().to_list(length=None)
     specialties = await specialties_col.find().to_list(length=None)
     consult_minutes_by_specialty = {str(s["_id"]): s["consult_minutes"] for s in specialties}

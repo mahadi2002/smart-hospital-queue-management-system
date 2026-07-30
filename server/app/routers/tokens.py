@@ -3,6 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.core.deps import get_current_user, get_current_user_optional
 from app.core.notify import notify
+from app.core.queue_rules import expire_overdue_calls
 from app.core.serializers import serialize_doc
 from app.core.utils import now_iso
 from app.database import doctors_col, patients_col, tokens_col
@@ -32,6 +33,8 @@ async def list_tokens(
         doctor_id = current_user["id"]  # own queue by default; explicit patient_id looks up that patient's full history
     # admin can pass either filter or neither
 
+    await expire_overdue_calls(doctor_id)
+
     query = {}
     if doctor_id:
         query["doctor_id"] = doctor_id
@@ -55,9 +58,10 @@ async def book_token(payload: TokenCreate, current_user: dict | None = Depends(g
     if not doctor:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Doctor not found.")
 
+    config = await get_queue_config()
+    today = now_iso()[:10]
+
     if payload.type == "emergency":
-        config = await get_queue_config()
-        today = now_iso()[:10]
         emergency_today = await tokens_col.count_documents(
             {
                 "doctor_id": payload.doctor_id,
@@ -69,6 +73,15 @@ async def book_token(payload: TokenCreate, current_user: dict | None = Depends(g
             raise HTTPException(
                 status.HTTP_400_BAD_REQUEST,
                 f"Emergency token limit ({config['emergency_cap_per_doctor_per_day']}/day) reached for this doctor.",
+            )
+    else:
+        tokens_today = await tokens_col.count_documents(
+            {"doctor_id": payload.doctor_id, "booked_at": {"$regex": f"^{today}"}}
+        )
+        if tokens_today >= config["max_daily_tokens_per_doctor"]:
+            raise HTTPException(
+                status.HTTP_400_BAD_REQUEST,
+                f"Daily token limit ({config['max_daily_tokens_per_doctor']}) reached for this doctor today.",
             )
 
     token = {
@@ -125,7 +138,11 @@ async def update_token_status(
     if not allowed:
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Not allowed to change this token's status.")
 
-    await tokens_col.update_one({"_id": ObjectId(token_id)}, {"$set": {"status": payload.status}})
+    update = {"status": payload.status}
+    if payload.status == "called":
+        update["called_at"] = now_iso()
+
+    await tokens_col.update_one({"_id": ObjectId(token_id)}, {"$set": update})
     doc = await tokens_col.find_one({"_id": ObjectId(token_id)})
     return serialize_doc(doc)
 
