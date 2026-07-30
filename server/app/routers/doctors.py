@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from app.core.deps import get_current_user, require_role
 from app.core.security import hash_password
 from app.core.serializers import serialize_doc, serialize_list
-from app.database import doctors_col, tokens_col
+from app.database import doctors_col, specialties_col, tokens_col
 from app.models.doctor import DoctorCreate, DoctorUpdate
 
 router = APIRouter(prefix="/doctors", tags=["doctors"])
@@ -22,6 +22,37 @@ def _public(doc: dict) -> dict:
 async def list_doctors():
     docs = await doctors_col.find().to_list(length=None)
     return [_public(d) for d in docs]
+
+
+@router.get("/queue-status")
+async def queue_status_all():
+    """Public snapshot for the guest directory: what token each doctor is
+    currently seeing, how many are waiting, and how long a new booking
+    would take right now (waiting_count * consult_minutes, plus one more
+    consult if someone is already being seen)."""
+    docs = await doctors_col.find().to_list(length=None)
+    specialties = await specialties_col.find().to_list(length=None)
+    consult_minutes_by_specialty = {str(s["_id"]): s["consult_minutes"] for s in specialties}
+
+    results = []
+    for d in docs:
+        doctor_id = str(d["_id"])
+        consult_minutes = consult_minutes_by_specialty.get(d.get("specialty_id"), 15)
+
+        current = await tokens_col.find_one({"doctor_id": doctor_id, "status": "in-consultation"})
+        waiting_count = await tokens_col.count_documents(
+            {"doctor_id": doctor_id, "status": {"$in": ["waiting", "called"]}}
+        )
+        estimated_wait_minutes = waiting_count * consult_minutes + (consult_minutes if current else 0)
+
+        results.append({
+            "doctor_id": doctor_id,
+            "current_token": current["token_number"] if current else None,
+            "waiting_count": waiting_count,
+            "estimated_wait_minutes": estimated_wait_minutes,
+        })
+
+    return results
 
 
 @router.get("/{doctor_id}")

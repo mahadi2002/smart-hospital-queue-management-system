@@ -23,6 +23,15 @@ export function normalizeDoctor(d) {
   }
 }
 
+export function normalizeQueueStatus(q) {
+  return {
+    doctorId: q.doctor_id,
+    currentToken: q.current_token,
+    waitingCount: q.waiting_count,
+    estimatedWaitMinutes: q.estimated_wait_minutes,
+  }
+}
+
 export function normalizeSpecialty(s) {
   return {
     id: s.id,

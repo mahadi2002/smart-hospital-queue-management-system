@@ -1,7 +1,8 @@
 """
 One-off script to load the hospital's starting data into MongoDB:
-8 specialties, 10 doctors, 4 patients, 1 admin, 6 health packages, and a
-handful of sample queue tokens so the app isn't empty on first run.
+8 specialties, 16 doctors (2 per specialty), 4 patients, 1 admin, 6 health
+packages, and a handful of sample queue tokens so the app isn't empty on
+first run.
 
 Safe to re-run — it wipes and reloads the collections each time, so don't
 run this against a database you care about keeping as-is.
@@ -69,6 +70,24 @@ DOCTORS = [
     ("Dr. Ayesha Siddika", "Medicine", "MBBS, FCPS (Medicine)", 6, "ayesha.siddika@moh-hospital.example",
      "+880 1711-000110", ["Sat", "Mon", "Tue", "Thu", "Sat"], "13:00 - 20:00",
      "Focuses on diabetes management and adult primary care."),
+    ("Dr. Mahfuza Akter", "Paediatrics", "MBBS, MD (Paediatrics)", 9, "mahfuza.akter@moh-hospital.example",
+     "+880 1711-000111", ["Sat", "Mon", "Tue", "Wed", "Thu"], "10:00 - 17:00",
+     "Focuses on childhood vaccination schedules and nutrition."),
+    ("Dr. Rafiqul Alam", "Orthopaedics", "MBBS, D-Ortho", 11, "rafiqul.alam@moh-hospital.example",
+     "+880 1711-000112", ["Sat", "Sun", "Tue", "Thu", "Fri"], "13:00 - 20:00",
+     "Specializes in sports injuries and spine care."),
+    ("Dr. Salma Chowdhury", "Neuro Medicine", "MBBS, FCPS (Neurology)", 10, "salma.chowdhury@moh-hospital.example",
+     "+880 1711-000113", ["Sat", "Sun", "Wed", "Thu", "Fri"], "09:00 - 16:00",
+     "Manages headache disorders and neuromuscular conditions."),
+    ("Dr. Nazmul Haque", "Dermatology", "MBBS, MD (Dermatology)", 7, "nazmul.haque@moh-hospital.example",
+     "+880 1711-000114", ["Sun", "Mon", "Tue", "Thu", "Fri"], "09:00 - 15:00",
+     "Focuses on acne, eczema, and cosmetic dermatology."),
+    ("Dr. Shirin Akhter", "ENT", "MBBS, D-ENT", 13, "shirin.akhter@moh-hospital.example",
+     "+880 1711-000115", ["Mon", "Tue", "Wed", "Thu", "Fri"], "10:00 - 18:00",
+     "Specializes in hearing disorders and paediatric ENT care."),
+    ("Dr. Ismat Jahan", "Obs & Gynae", "MBBS, MS (Gynae & Obs)", 12, "ismat.jahan@moh-hospital.example",
+     "+880 1711-000116", ["Sun", "Mon", "Wed", "Thu", "Fri"], "14:00 - 21:00",
+     "Focuses on fertility care and minimally invasive gynaecological surgery."),
 ]
 
 PATIENTS = [
