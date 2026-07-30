@@ -1,0 +1,41 @@
+.screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  text-align: center;
+  gap: 18px;
+}
+
+.patient {
+  background: linear-gradient(160deg, #7a1b29 0%, #a32638 45%, #d97a3f 100%);
+}
+
+.doctor {
+  background:
+    repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0 26px, rgba(255, 255, 255, 0) 26px 52px),
+    #1f2937;
+}
+
+.admin {
+  background:
+    radial-gradient(circle at 50% 30%, rgba(163, 38, 56, 0.6) 0, rgba(163, 38, 56, 0) 50%),
+    linear-gradient(180deg, #0b5039 0%, #0f6b4f 100%);
+}
+
+.spinner {
+  width: 44px;
+  height: 44px;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
