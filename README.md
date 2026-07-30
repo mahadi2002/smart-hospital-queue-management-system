@@ -121,15 +121,20 @@ etc.) with a MongoDB connection string in its environment.
 
 ## Demo Logins
 
-| Role    | Email                                | Password      |
-|---------|---------------------------------------|---------------|
-| Patient | abdullah.mamun@example.com            | password123   |
-| Doctor  | farhana.kabir@moh-hospital.example    | doctor123     |
-| Admin   | admin@moh-hospital.example             | admin123      |
+`seed.py` loads 60 doctors (varying 6-10 per specialty), 40 patients, and 40 admins.
+Every seeded account in a given role shares the same password, so any of them will
+get you in:
+
+| Role    | Password    | A few of the 40-60 seeded emails                                            |
+|---------|-------------|-------------------------------------------------------------------------------|
+| Patient | password123 | abdullah.mamun@example.com, nasrin.sultana@example.com, rakibul.islam@example.com |
+| Doctor  | doctor123   | farhana.kabir@moh-hospital.example, kamrul.hasan@moh-hospital.example (full list: `GET /doctors` or **Admin → Doctors**) |
+| Admin   | admin123    | admin@moh-hospital.example (Super Admin), md.nurul.islam@moh-hospital.example (full list: **Admin → Admins**) |
 
 New patient accounts can also be created via **Register**. Doctor and Admin accounts
-are provisioned by an Admin (**Admin → Doctors → Add Doctor**) — there's no
-doctor/admin self-registration, matching the original hospital's account model.
+are provisioned by an Admin — **Admin → Doctors → Add Doctor** or **Admin → Admins →
+Add Admin** — there's no doctor/admin self-registration, matching the original
+hospital's account model.
 
 ## API Overview
 
@@ -139,14 +144,17 @@ by FastAPI) are available at `/docs` once the server is running.
 | Area          | Endpoints |
 |---------------|-----------|
 | Auth          | `POST /auth/register`, `POST /auth/login/{patient,doctor,admin}`, `GET /auth/me` |
-| Doctors       | `GET /doctors`, `GET /doctors/{id}`, `POST /doctors`, `PATCH /doctors/{id}`, `PATCH /doctors/{id}/queue-pause`, `DELETE /doctors/{id}` |
+| Doctors       | `GET /doctors`, `GET /doctors/queue-status`, `GET /doctors/{id}`, `POST /doctors`, `PATCH /doctors/{id}`, `PATCH /doctors/{id}/queue-pause`, `DELETE /doctors/{id}` |
 | Patients      | `GET /patients`, `GET /patients/{id}`, `POST /patients`, `PATCH /patients/{id}`, `DELETE /patients/{id}` |
-| Admins        | `PATCH /admins/{id}` |
+| Admins        | `GET /admins`, `POST /admins`, `PATCH /admins/{id}`, `DELETE /admins/{id}` |
 | Specialties   | `GET /specialties`, `POST /specialties`, `DELETE /specialties/{id}` |
-| Packages      | `GET /packages` |
+| Packages      | `GET /packages`, `GET /packages/reservations`, `POST /packages/{id}/reserve` |
 | Tokens/Queue  | `GET /tokens`, `POST /tokens`, `PATCH /tokens/{id}/status`, `POST /tokens/{id}/complete` |
 | Notifications | `GET /notifications`, `PATCH /notifications/mark-all-read`, `DELETE /notifications` |
 | Queue Config  | `GET /config`, `PATCH /config` |
+
+`GET /doctors/queue-status` and `POST /packages/{id}/reserve` are public — a guest
+can see today's live queue and reserve a health package without an account.
 
 Authentication is a `Bearer <token>` header, issued by the login endpoints and
 verified on every protected route. Booking a token (`POST /tokens`) is the one
