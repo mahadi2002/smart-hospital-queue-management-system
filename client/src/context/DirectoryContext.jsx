@@ -5,14 +5,19 @@ import { normalizeDoctor, normalizeSpecialty } from '../services/normalize'
 const DirectoryContext = createContext(null)
 
 export function DirectoryProvider({ children }) {
-  const [doctors, setDoctors] = useState([])
+  // We fetch removed doctors too, otherwise a patient's old bookings would
+  // lose the name of who they saw. `doctors` below hides them again so
+  // nothing can browse or book an archived doctor by accident.
+  const [allDoctors, setAllDoctors] = useState([])
   const [specialties, setSpecialties] = useState([])
   const [packages, setPackages] = useState([])
   const [loading, setLoading] = useState(true)
 
+  const doctors = allDoctors.filter((d) => d.status !== 'archived')
+
   const refetchDoctors = useCallback(async () => {
-    const { data } = await api.get('/doctors')
-    setDoctors(data.map(normalizeDoctor))
+    const { data } = await api.get('/doctors', { params: { include_archived: true } })
+    setAllDoctors(data.map(normalizeDoctor))
   }, [])
 
   const refetchSpecialties = useCallback(async () => {
@@ -23,11 +28,11 @@ export function DirectoryProvider({ children }) {
   useEffect(() => {
     async function loadAll() {
       const [doctorsRes, specialtiesRes, packagesRes] = await Promise.all([
-        api.get('/doctors'),
+        api.get('/doctors', { params: { include_archived: true } }),
         api.get('/specialties'),
         api.get('/packages'),
       ])
-      setDoctors(doctorsRes.data.map(normalizeDoctor))
+      setAllDoctors(doctorsRes.data.map(normalizeDoctor))
       setSpecialties(specialtiesRes.data.map(normalizeSpecialty))
       setPackages(packagesRes.data)
       setLoading(false)
@@ -35,8 +40,10 @@ export function DirectoryProvider({ children }) {
     loadAll()
   }, [])
 
+  // Searches archived doctors too, so past bookings keep showing the name of
+  // whoever the patient actually saw.
   function getDoctorById(id) {
-    return doctors.find((d) => d.id === id)
+    return allDoctors.find((d) => d.id === id)
   }
 
   function getDoctorsBySpecialty(specialtyId) {
@@ -49,6 +56,7 @@ export function DirectoryProvider({ children }) {
 
   const value = {
     doctors,
+    allDoctors,
     specialties,
     packages,
     loading,

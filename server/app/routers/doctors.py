@@ -5,12 +5,14 @@ from app.core.deps import get_current_user, require_role
 from app.core.queue_rules import expire_overdue_calls
 from app.core.security import hash_password
 from app.core.serializers import serialize_doc, serialize_list
+from app.core.utils import now_iso
 from app.database import doctors_col, specialties_col, tokens_col
 from app.models.doctor import DoctorCreate, DoctorUpdate
 
 router = APIRouter(prefix="/doctors", tags=["doctors"])
 
 DEFAULT_DOCTOR_PASSWORD = "doctor123"
+ARCHIVED_STATUS = "archived"
 
 
 def _public(doc: dict) -> dict:
@@ -20,8 +22,12 @@ def _public(doc: dict) -> dict:
 
 
 @router.get("")
-async def list_doctors():
-    docs = await doctors_col.find().to_list(length=None)
+async def list_doctors(include_archived: bool = False):
+    """Removed doctors are hidden by default so they can't be browsed or
+    booked. Pass include_archived=true where old records still need to
+    resolve a name (patient history, admin audit)."""
+    query = {} if include_archived else {"status": {"$ne": ARCHIVED_STATUS}}
+    docs = await doctors_col.find(query).to_list(length=None)
     return [_public(d) for d in docs]
 
 
@@ -33,7 +39,7 @@ async def queue_status_all():
     consult if someone is already being seen)."""
     await expire_overdue_calls()
 
-    docs = await doctors_col.find().to_list(length=None)
+    docs = await doctors_col.find({"status": {"$ne": ARCHIVED_STATUS}}).to_list(length=None)
     specialties = await specialties_col.find().to_list(length=None)
     consult_minutes_by_specialty = {str(s["_id"]): s["consult_minutes"] for s in specialties}
 
@@ -123,13 +129,28 @@ async def set_queue_paused(doctor_id: str, paused: bool, current_user: dict = De
 
 @router.delete("/{doctor_id}", dependencies=[Depends(require_role("admin"))])
 async def delete_doctor(doctor_id: str):
+    """Archive rather than erase. Dropping the row would orphan every token
+    the doctor ever handled, so a patient's old bookings would lose the name
+    of who they actually saw. Instead we strip the password hash — which is
+    what actually ends their access — and mark the record archived so it
+    stops showing up anywhere you can browse or book."""
+    doctor = await doctors_col.find_one({"_id": ObjectId(doctor_id)})
+    if not doctor:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Doctor not found.")
+    if doctor.get("status") == ARCHIVED_STATUS:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "This doctor has already been removed.")
+
     active = await tokens_col.count_documents(
         {"doctor_id": doctor_id, "status": {"$in": ["waiting", "called", "in-consultation"]}}
     )
     if active > 0:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "Doctor has active tokens and cannot be removed.")
 
-    result = await doctors_col.delete_one({"_id": ObjectId(doctor_id)})
-    if result.deleted_count == 0:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Doctor not found.")
+    await doctors_col.update_one(
+        {"_id": ObjectId(doctor_id)},
+        {
+            "$set": {"status": ARCHIVED_STATUS, "archived_at": now_iso(), "queue_paused": True},
+            "$unset": {"password_hash": ""},
+        },
+    )
     return {"ok": True}

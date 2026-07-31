@@ -14,6 +14,7 @@ from app.models.patient import PatientLogin, PatientRegister
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 COLLECTION_BY_ROLE = {"patient": patients_col, "doctor": doctors_col, "admin": admins_col}
+ARCHIVED_STATUS = "archived"
 
 
 def _profile_without_password(doc: dict) -> dict:
@@ -60,7 +61,15 @@ async def login_patient(payload: PatientLogin):
 @router.post("/login/doctor")
 async def login_doctor(payload: DoctorLogin):
     doctor = await doctors_col.find_one({"email": payload.email})
-    if not doctor or not verify_password(payload.password, doctor["password_hash"]):
+    # A removed doctor keeps their record so old bookings still show who the
+    # patient saw, but the password hash is gone — there's nothing left to
+    # log in with, and the status check makes that explicit.
+    if (
+        not doctor
+        or doctor.get("status") == ARCHIVED_STATUS
+        or not doctor.get("password_hash")
+        or not verify_password(payload.password, doctor["password_hash"])
+    ):
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Invalid email or password.")
 
     token = create_access_token(subject=str(doctor["_id"]), role="doctor")

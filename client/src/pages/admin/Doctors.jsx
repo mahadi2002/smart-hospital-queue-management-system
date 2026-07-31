@@ -7,19 +7,22 @@ import { useDirectory } from '../../context/DirectoryContext'
 import { showConfirm, showCredentials, showError, showToast } from '../../utils/toast'
 
 export default function Doctors() {
-  const { doctors, specialties, getSpecialtyById, refetchDoctors } = useDirectory()
+  const { doctors, allDoctors, specialties, getSpecialtyById, refetchDoctors } = useDirectory()
   const [addOpen, setAddOpen] = useState(false)
   const [search, setSearch] = useState('')
   const [specialtyFilter, setSpecialtyFilter] = useState('all')
+  const [showRemoved, setShowRemoved] = useState(false)
+
+  const source = showRemoved ? allDoctors : doctors
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase()
-    return doctors.filter((d) => {
+    return source.filter((d) => {
       const matchesSpecialty = specialtyFilter === 'all' || d.specialtyId === specialtyFilter
       const matchesSearch = !q || d.name.toLowerCase().includes(q) || d.email.toLowerCase().includes(q)
       return matchesSpecialty && matchesSearch
     })
-  }, [doctors, search, specialtyFilter])
+  }, [source, search, specialtyFilter])
 
   async function handleAdd(data) {
     try {
@@ -44,7 +47,9 @@ export default function Doctors() {
   async function handleRemove(doctor) {
     const confirmed = await showConfirm({
       title: `Remove ${doctor.name}?`,
-      text: 'This doctor will no longer appear in the directory or booking flow.',
+      text:
+        'They lose access straight away and stop appearing in the directory and booking flow. ' +
+        'Their past consultations stay on record, so patient history is unaffected.',
       confirmText: 'Remove',
     })
     if (!confirmed) return
@@ -92,10 +97,22 @@ export default function Doctors() {
             </option>
           ))}
         </select>
+        <div className="form-check d-flex align-items-center gap-2 ms-1">
+          <input
+            className="form-check-input mt-0"
+            type="checkbox"
+            id="showRemoved"
+            checked={showRemoved}
+            onChange={(e) => setShowRemoved(e.target.checked)}
+          />
+          <label className="form-check-label text-shq-secondary" htmlFor="showRemoved">
+            Include removed
+          </label>
+        </div>
       </div>
 
       <p className="text-shq-secondary small mb-3">
-        {filtered.length} of {doctors.length} doctors
+        {filtered.length} of {source.length} doctors
       </p>
 
       <Card className="p-0">
@@ -114,24 +131,37 @@ export default function Doctors() {
               </tr>
             </thead>
             <tbody>
-              {filtered.map((d) => (
-                <tr key={d.id}>
-                  <td className="fw-semibold">{d.name}</td>
-                  <td>{getSpecialtyById(d.specialtyId)?.name}</td>
-                  <td>{d.experienceYears} yrs</td>
-                  <td>{d.roomNumber || '—'}</td>
-                  <td>৳{d.consultationFee || 0}</td>
-                  <td className="text-shq-secondary small">{d.email}</td>
-                  <td>
-                    <span className="badge bg-success-subtle text-success-emphasis text-capitalize">{d.status}</span>
-                  </td>
-                  <td className="text-end">
-                    <button className="btn btn-outline-danger btn-sm" onClick={() => handleRemove(d)}>
-                      <Trash2 size={14} />
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {filtered.map((d) => {
+                const archived = d.status === 'archived'
+                return (
+                  <tr key={d.id} className={archived ? 'text-shq-secondary' : ''}>
+                    <td className="fw-semibold">{d.name}</td>
+                    <td>{getSpecialtyById(d.specialtyId)?.name}</td>
+                    <td>{d.experienceYears} yrs</td>
+                    <td>{d.roomNumber || '—'}</td>
+                    <td>৳{d.consultationFee || 0}</td>
+                    <td className="text-shq-secondary small">{d.email}</td>
+                    <td>
+                      <span
+                        className={`badge text-capitalize ${
+                          archived
+                            ? 'bg-secondary-subtle text-secondary-emphasis'
+                            : 'bg-success-subtle text-success-emphasis'
+                        }`}
+                      >
+                        {archived ? 'removed' : d.status}
+                      </span>
+                    </td>
+                    <td className="text-end">
+                      {!archived && (
+                        <button className="btn btn-outline-danger btn-sm" onClick={() => handleRemove(d)}>
+                          <Trash2 size={14} />
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         </div>
