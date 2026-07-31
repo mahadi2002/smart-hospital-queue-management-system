@@ -5,7 +5,7 @@ import Card from '../../components/ui/Card'
 import AddPatientModal from '../../components/admin/AddPatientModal'
 import api from '../../services/api'
 import { normalizePatient } from '../../services/normalize'
-import { showConfirm, showError, showToast } from '../../utils/toast'
+import { showConfirm, showCredentials, showError, showToast } from '../../utils/toast'
 
 export default function Patients() {
   const [patients, setPatients] = useState([])
@@ -31,16 +31,18 @@ export default function Patients() {
 
   async function handleAdd(data) {
     try {
+      const password = data.password?.trim() || 'password123'
       await api.post('/patients', {
         name: data.name,
         email: data.email,
         phone: data.phone,
         dob: data.dob,
         gender: data.gender,
+        password,
       })
       await refetch()
       setAddOpen(false)
-      showToast('Patient added.')
+      await showCredentials({ role: 'Patient', name: data.name, email: data.email, password })
     } catch (err) {
       showError('Could not add patient', err.response?.data?.detail || 'Something went wrong.')
     }

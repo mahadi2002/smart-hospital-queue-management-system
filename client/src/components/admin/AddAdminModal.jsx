@@ -53,6 +53,17 @@ export default function AddAdminModal({ open, onClose, onAdd }) {
             <option value="Super Admin">Super Admin</option>
           </select>
         </div>
+        <div className="mb-3">
+          <label className="form-label">Temporary Password</label>
+          <input
+            className="form-control"
+            placeholder="Leave blank to use admin123"
+            {...register('password')}
+          />
+          <div className="form-text">
+            You'll get the login details to pass on once the account is created.
+          </div>
+        </div>
         <button type="submit" className="btn btn-primary w-100">
           Add Admin
         </button>

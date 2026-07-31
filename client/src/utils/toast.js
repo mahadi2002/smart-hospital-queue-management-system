@@ -32,3 +32,30 @@ export function showConfirm({ title, text, confirmText = 'Confirm', cancelText =
 export function showError(title, text) {
   return Swal.fire({ title, text, icon: 'error', ...brand })
 }
+
+// After an admin creates a doctor/patient/admin account, they still have to
+// tell that person how to get in. Show the credentials once, clearly enough
+// to write down or copy.
+export function showCredentials({ role, name, email, password }) {
+  return Swal.fire({
+    title: `${role} account created`,
+    icon: 'success',
+    html: `
+      <p style="margin-bottom:12px">Give <strong>${name}</strong> these details so they can log in:</p>
+      <div style="text-align:left;background:#f5f6f8;border:1px solid #d6dee6;border-radius:10px;padding:12px 14px;font-size:0.95rem">
+        <div style="margin-bottom:6px"><strong>Email</strong><br><code>${email}</code></div>
+        <div><strong>Password</strong><br><code>${password}</code></div>
+      </div>
+      <p style="margin-top:12px;font-size:0.85rem;color:#6b7280">
+        Ask them to change it after their first login.
+      </p>
+    `,
+    confirmButtonText: 'Copy & close',
+    ...brand,
+  }).then((result) => {
+    if (result.isConfirmed && navigator.clipboard) {
+      navigator.clipboard.writeText(`Email: ${email}\nPassword: ${password}`).catch(() => {})
+    }
+    return result.isConfirmed
+  })
+}

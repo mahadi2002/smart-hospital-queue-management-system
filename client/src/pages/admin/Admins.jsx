@@ -5,7 +5,7 @@ import AddAdminModal from '../../components/admin/AddAdminModal'
 import api from '../../services/api'
 import { normalizeAdmin } from '../../services/normalize'
 import { useAuth } from '../../context/AuthContext'
-import { showConfirm, showError, showToast } from '../../utils/toast'
+import { showConfirm, showCredentials, showError, showToast } from '../../utils/toast'
 
 export default function Admins() {
   const { session } = useAuth()
@@ -32,16 +32,18 @@ export default function Admins() {
 
   async function handleAdd(data) {
     try {
+      const password = data.password?.trim() || 'admin123'
       await api.post('/admins', {
         name: data.name,
         email: data.email,
         phone: data.phone,
         department: data.department,
         role: data.role,
+        password,
       })
       await refetch()
       setAddOpen(false)
-      showToast('Admin added.')
+      await showCredentials({ role: 'Admin', name: data.name, email: data.email, password })
     } catch (err) {
       showError('Could not add admin', err.response?.data?.detail || 'Something went wrong.')
     }

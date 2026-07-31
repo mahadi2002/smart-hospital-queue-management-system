@@ -16,6 +16,7 @@ class PatientCreateByAdmin(BaseModel):
     phone: str
     dob: str | None = ""
     gender: str | None = ""
+    password: str | None = None
 
 
 class PatientLogin(BaseModel):

@@ -46,6 +46,17 @@ export default function AddPatientModal({ open, onClose, onAdd }) {
             </select>
           </div>
         </div>
+        <div className="mb-3">
+          <label className="form-label">Temporary Password</label>
+          <input
+            className="form-control"
+            placeholder="Leave blank to use password123"
+            {...register('password')}
+          />
+          <div className="form-text">
+            You'll get the login details to pass on once the account is created.
+          </div>
+        </div>
         <button type="submit" className="btn btn-primary w-100">
           Add Patient
         </button>

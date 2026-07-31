@@ -54,6 +54,17 @@ export default function AddDoctorModal({ open, onClose, onAdd }) {
             <input className={`form-control ${errors.phone ? 'is-invalid' : ''}`} {...register('phone', { required: true })} />
           </div>
         </div>
+        <div className="mb-3">
+          <label className="form-label">Temporary Password</label>
+          <input
+            className={`form-control ${errors.password ? 'is-invalid' : ''}`}
+            placeholder="Leave blank to use doctor123"
+            {...register('password')}
+          />
+          <div className="form-text">
+            You'll get the login details to pass on once the account is created.
+          </div>
+        </div>
         <button type="submit" className="btn btn-primary w-100">
           Add Doctor
         </button>

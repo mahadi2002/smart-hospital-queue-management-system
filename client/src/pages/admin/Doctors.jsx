@@ -4,7 +4,7 @@ import Card from '../../components/ui/Card'
 import AddDoctorModal from '../../components/admin/AddDoctorModal'
 import api from '../../services/api'
 import { useDirectory } from '../../context/DirectoryContext'
-import { showConfirm, showError, showToast } from '../../utils/toast'
+import { showConfirm, showCredentials, showError, showToast } from '../../utils/toast'
 
 export default function Doctors() {
   const { doctors, specialties, getSpecialtyById, refetchDoctors } = useDirectory()
@@ -23,6 +23,7 @@ export default function Doctors() {
 
   async function handleAdd(data) {
     try {
+      const password = data.password?.trim() || 'doctor123'
       await api.post('/doctors', {
         name: data.name,
         specialty_id: data.specialtyId,
@@ -30,10 +31,11 @@ export default function Doctors() {
         experience_years: Number(data.experienceYears),
         email: data.email,
         phone: data.phone,
+        password,
       })
       await refetchDoctors()
       setAddOpen(false)
-      showToast('Doctor added.')
+      await showCredentials({ role: 'Doctor', name: data.name, email: data.email, password })
     } catch (err) {
       showError('Could not add doctor', err.response?.data?.detail || 'Something went wrong.')
     }
