@@ -32,10 +32,10 @@ The build happened in two passes:
 ## Architecture
 
 ```
-┌─────────────────────┐        JSON over HTTP        ┌──────────────────────┐        ┌─────────────┐
+┌──────────────────────┐        JSON over HTTP          ┌──────────────────────┐        ┌─────────────┐
 │   client/ (React)    │  ───────────────────────────▶ │   server/ (FastAPI)  │ ──────▶│   MongoDB   │
-│   Vite + React Router│ ◀─────────────────────────── │   JWT auth, REST API │ ◀──────│  (local)    │
-└─────────────────────┘        Bearer token auth       └──────────────────────┘        └─────────────┘
+│   Vite + React Router│ ◀───────────────────────────  │   JWT auth, REST API │ ◀──────│  (local)    │
+└──────────────────────┘        Bearer token auth       └──────────────────────┘        └─────────────┘
 ```
 
 - The **client** never talks to a database directly — every piece of data (doctors,
