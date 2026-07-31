@@ -1,3 +1,4 @@
+from bson import ObjectId
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.core.deps import get_current_user
@@ -6,10 +7,13 @@ from app.core.serializers import serialize_doc
 from app.core.utils import initials
 from app.database import admins_col, doctors_col, patients_col
 from app.models.admin import AdminLogin
+from app.models.auth import ChangePassword
 from app.models.doctor import DoctorLogin
 from app.models.patient import PatientLogin, PatientRegister
 
 router = APIRouter(prefix="/auth", tags=["auth"])
+
+COLLECTION_BY_ROLE = {"patient": patients_col, "doctor": doctors_col, "admin": admins_col}
 
 
 def _profile_without_password(doc: dict) -> dict:
@@ -75,13 +79,35 @@ async def login_admin(payload: AdminLogin):
 
 @router.get("/me")
 async def get_my_profile(current_user: dict = Depends(get_current_user)):
-    collections = {"patient": patients_col, "doctor": doctors_col, "admin": admins_col}
-    collection = collections[current_user["role"]]
-
-    from bson import ObjectId
+    collection = COLLECTION_BY_ROLE[current_user["role"]]
 
     doc = await collection.find_one({"_id": ObjectId(current_user["id"])})
     if not doc:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Profile not found.")
 
     return {"role": current_user["role"], "profile": _profile_without_password(doc)}
+
+
+@router.post("/change-password")
+async def change_password(payload: ChangePassword, current_user: dict = Depends(get_current_user)):
+    """Any logged-in user changes their own password. Works the same for all
+    three roles — the token says who you are, so nobody can change someone
+    else's password through here."""
+    if len(payload.new_password) < 8:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "New password must be at least 8 characters.")
+    if payload.new_password == payload.current_password:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "New password must be different from the current one.")
+
+    collection = COLLECTION_BY_ROLE[current_user["role"]]
+    doc = await collection.find_one({"_id": ObjectId(current_user["id"])})
+    if not doc:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Profile not found.")
+
+    if not verify_password(payload.current_password, doc["password_hash"]):
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "Current password is incorrect.")
+
+    await collection.update_one(
+        {"_id": ObjectId(current_user["id"])},
+        {"$set": {"password_hash": hash_password(payload.new_password)}},
+    )
+    return {"ok": True}
