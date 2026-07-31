@@ -6,6 +6,15 @@ import SupportModal from './SupportModal'
 import { useAuth } from '../../context/AuthContext'
 import { useNotifications } from '../../context/NotificationsContext'
 
+// The header shows something different under each name: a patient's record
+// number, where to find the doctor, or the admin's job title.
+function profileSubtitle(role, profile) {
+  if (!profile) return ''
+  if (role === 'patient') return profile.mrn || 'Patient'
+  if (role === 'doctor') return profile.roomNumber ? `Room ${profile.roomNumber}` : 'Consultant'
+  return profile.role || 'Admin'
+}
+
 export default function DashboardLayout({ role }) {
   const { session, isAuthenticated, profile, loading } = useAuth()
   const { unreadCount } = useNotifications()
@@ -35,7 +44,8 @@ export default function DashboardLayout({ role }) {
       <div className="shq-main-column">
         <Topbar
           profileName={profile?.name || 'User'}
-          profileRole={role}
+          profileSubtitle={profileSubtitle(role, profile)}
+          role={role}
           avatarInitials={profile?.avatarInitials || '??'}
           notificationsPath={`/${role}/notifications`}
           profilePath={`/${role}/profile`}

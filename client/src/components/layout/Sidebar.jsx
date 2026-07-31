@@ -6,6 +6,12 @@ import { NAV_ITEMS } from '../../config/navigation'
 import { useAuth } from '../../context/AuthContext'
 import styles from './Sidebar.module.css'
 
+const ROLE_SUBTITLE = {
+  patient: 'Patient Portal',
+  doctor: 'Clinician Console',
+  admin: 'Admin Console',
+}
+
 export default function Sidebar({ role, onOpenSupport, mobileOpen, onClose }) {
   const { logout } = useAuth()
   const navigate = useNavigate()
@@ -21,12 +27,18 @@ export default function Sidebar({ role, onOpenSupport, mobileOpen, onClose }) {
       {mobileOpen && <div className={styles.backdrop} onClick={onClose} />}
       <aside className={`${styles.sidebar} ${styles[`sidebar--${role}`]} ${mobileOpen ? styles.sidebarOpen : ''}`}>
         <div className={styles.brand}>
-          <Logo size={28} color="#fff" />
-          <span>Smart Hospital Queue Management System</span>
+          <span className={styles.brandMark}>
+            <Logo size={22} color="#fff" />
+          </span>
+          <span className={styles.brandText}>
+            <span className={styles.brandName}>Martyr Osman Hadi Hospital</span>
+            <span className={styles.brandRole}>{ROLE_SUBTITLE[role]}</span>
+          </span>
           <button type="button" className={styles.closeBtn} onClick={onClose} aria-label="Close menu">
             <X size={20} />
           </button>
         </div>
+        <div className={styles.menuLabel}>Menu</div>
         <nav className={styles.nav} style={{ paddingBottom: 150 }}>
           {items.map((item) => (
             <NavLink
@@ -42,7 +54,10 @@ export default function Sidebar({ role, onOpenSupport, mobileOpen, onClose }) {
         </nav>
         <button type="button" className={styles.supportCard} onClick={onOpenSupport}>
           <Headset size={18} />
-          Contact Support
+          <span>
+            <span className={styles.supportTitle}>Need help?</span>
+            <span className={styles.supportSub}>24/7 support desk</span>
+          </span>
         </button>
         <button type="button" className={styles.logoutBtn} onClick={handleLogout}>
           <LogOut size={18} />

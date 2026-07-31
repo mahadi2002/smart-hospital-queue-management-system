@@ -50,5 +50,6 @@ class PatientOut(BaseModel):
     blood_group: str
     address: str
     avatar_initials: str
+    mrn: str = ""
     medical_history: list[dict]
     reports: list[dict]

@@ -93,6 +93,8 @@ async def book_token(payload: TokenCreate, current_user: dict | None = Depends(g
         "status": "waiting",
         "booked_at": now_iso(),
         "slot_time": payload.slot_time,
+        "reason": payload.reason or "",
+        "checked_in_at": now_iso(),
     }
     result = await tokens_col.insert_one(token)
     doc = await tokens_col.find_one({"_id": result.inserted_id})

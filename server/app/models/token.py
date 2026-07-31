@@ -19,6 +19,7 @@ class TokenCreate(BaseModel):
     patient_name: str
     type: str = "regular"
     slot_time: str
+    reason: str | None = ""
 
 
 class TokenStatusUpdate(BaseModel):
@@ -40,3 +41,5 @@ class TokenOut(BaseModel):
     status: str
     booked_at: str
     slot_time: str
+    reason: str = ""
+    checked_in_at: str = ""

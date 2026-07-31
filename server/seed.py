@@ -15,6 +15,7 @@ Usage:
 
 import asyncio
 import random
+from datetime import date, timedelta
 
 from app.core.security import hash_password
 from app.database import (
@@ -37,6 +38,11 @@ SPECIALTIES = [
     {"name": "Obs & Gynae", "consult_minutes": 22, "icon": "Flower2"},
     {"name": "Medicine", "consult_minutes": 10, "icon": "Stethoscope"},
 ]
+
+# "Today's queue" has to actually be today, otherwise every wait time on the
+# doctor's screen reads in the thousands of minutes the day after seeding.
+TODAY = date.today().isoformat()
+YESTERDAY = (date.today() - timedelta(days=1)).isoformat()
 
 DOCTOR_DEMO_PASSWORD = "doctor123"
 PATIENT_DEMO_PASSWORD = "password123"
@@ -318,6 +324,12 @@ _DHAKA_AREAS = [
 ]
 _BLOOD_GROUPS = ["A+", "B+", "O+", "AB+", "A-", "B-", "O-", "AB-"]
 
+_REPORT_TYPES = [
+    "Blood Test Report", "Chest X-Ray", "ECG Report", "Ultrasound Report",
+    "Lipid Profile", "Thyroid Profile", "Urine Routine", "HbA1c Report",
+    "Kidney Function Test", "Liver Function Test", "Bone Density Scan", "CT Scan Report",
+]
+
 # A doctor+specialty pool for generating plausible visit-history entries.
 _HISTORY_DOCTORS = [
     ("Dr. Rezaul Karim", "Cardiology", "Palpitations on exertion", "ECG normal. Advised follow-up if symptoms recur."),
@@ -338,17 +350,24 @@ def _generate_extra_patients():
         birth_year = 1965 + (i * 3) % 55
         birth_month = 1 + (i * 7) % 12
         birth_day = 1 + (i * 11) % 28
+        # Everyone who has been coming here a while has a few visits behind
+        # them, not one. Long-standing patients build up thicker files.
         history = []
-        reports = []
-        if i % 3 == 0:
-            doctor, specialty, diagnosis, notes = _HISTORY_DOCTORS[i % len(_HISTORY_DOCTORS)]
+        visit_count = 2 + (i % 4)
+        for v in range(visit_count):
+            doctor, specialty, diagnosis, notes = _HISTORY_DOCTORS[(i + v * 3) % len(_HISTORY_DOCTORS)]
             history.append({
-                "date": f"2026-{1 + (i % 7):02d}-{1 + (i % 27):02d}",
+                "date": f"2026-{1 + ((i + v * 2) % 7):02d}-{1 + ((i + v * 5) % 27):02d}",
                 "doctor": doctor, "specialty": specialty, "diagnosis": diagnosis, "notes": notes,
             })
-        if i % 4 == 0:
+        history.sort(key=lambda h: h["date"], reverse=True)
+
+        reports = []
+        for r in range(1 + (i % 3)):
             reports.append({
-                "name": "Blood Test Report", "date": f"2026-{1 + (i % 7):02d}-{1 + (i % 27):02d}", "type": "PDF",
+                "name": _REPORT_TYPES[(i + r * 4) % len(_REPORT_TYPES)],
+                "date": f"2026-{1 + ((i + r) % 7):02d}-{1 + ((i + r * 3) % 27):02d}",
+                "type": "PDF",
             })
         patients.append({
             "name": name,
@@ -359,6 +378,7 @@ def _generate_extra_patients():
             "blood_group": _BLOOD_GROUPS[i % len(_BLOOD_GROUPS)],
             "address": f"{_DHAKA_AREAS[i % len(_DHAKA_AREAS)]}, Dhaka",
             "avatar_initials": initials,
+            "mrn": f"MRN {55000 + i * 7}",
             "medical_history": history,
             "reports": reports,
         })
@@ -366,6 +386,88 @@ def _generate_extra_patients():
 
 
 PATIENTS += _generate_extra_patients()
+
+# The four hand-written patients above predate the MRN field, so give them one too.
+for _i, _p in enumerate(PATIENTS[:4]):
+    _p["mrn"] = f"MRN {54100 + _i * 13}"
+
+# A few extra accounts with tidy addresses, handy when demoing the three roles
+# side by side without hunting through the 40-row patient list.
+DEMO_PATIENTS = [
+    {
+        "name": "Imran Chowdhury", "phone": "+880 1611-100301", "email": "imran.chowdhury@example.com",
+        "dob": "1988-09-17", "gender": "Male", "blood_group": "A+", "address": "Banani, Dhaka",
+        "avatar_initials": "IC", "mrn": "MRN 56010",
+        "medical_history": [
+            {"date": "2026-06-11", "doctor": "Dr. Mahbub Alam", "specialty": "Medicine",
+             "diagnosis": "Type 2 diabetes, newly diagnosed",
+             "notes": "Started on metformin. Diet counselling done. Repeat HbA1c in 3 months."},
+            {"date": "2026-03-04", "doctor": "Dr. Nasrin Akhter", "specialty": "Cardiology",
+             "diagnosis": "Borderline hypertension",
+             "notes": "No medication yet. Advised salt reduction and daily walking."},
+            {"date": "2025-11-22", "doctor": "Dr. Laila Yesmin", "specialty": "ENT",
+             "diagnosis": "Allergic rhinitis", "notes": "Seasonal. Antihistamine as needed."},
+        ],
+        "reports": [
+            {"name": "HbA1c Report", "date": "2026-06-11", "type": "PDF"},
+            {"name": "Lipid Profile", "date": "2026-06-11", "type": "PDF"},
+            {"name": "ECG Report", "date": "2026-03-04", "type": "PDF"},
+        ],
+    },
+    {
+        "name": "Sadia Rahman", "phone": "+880 1611-100302", "email": "sadia.rahman@example.com",
+        "dob": "1996-02-08", "gender": "Female", "blood_group": "B+", "address": "Uttara, Dhaka",
+        "avatar_initials": "SR", "mrn": "MRN 56011",
+        "medical_history": [
+            {"date": "2026-07-02", "doctor": "Dr. Momtaz Begum", "specialty": "Dermatology",
+             "diagnosis": "Eczema flare on both hands",
+             "notes": "Topical steroid for 2 weeks. Avoid detergent contact, use gloves."},
+            {"date": "2026-01-19", "doctor": "Dr. Ruksana Akhter", "specialty": "Obs & Gynae",
+             "diagnosis": "Routine screening", "notes": "All results normal. Review next year."},
+        ],
+        "reports": [
+            {"name": "Blood Test Report", "date": "2026-07-02", "type": "PDF"},
+            {"name": "Thyroid Profile", "date": "2026-01-19", "type": "PDF"},
+        ],
+    },
+    {
+        "name": "Anwar Hossain Khan", "phone": "+880 1611-100303", "email": "anwar.khan@example.com",
+        "dob": "1959-05-30", "gender": "Male", "blood_group": "O+", "address": "Mohammadpur, Dhaka",
+        "avatar_initials": "AK", "mrn": "MRN 56012",
+        "medical_history": [
+            {"date": "2026-07-15", "doctor": "Dr. Aminul Islam", "specialty": "Orthopaedics",
+             "diagnosis": "Osteoarthritis, right knee",
+             "notes": "Grade 2 on X-ray. Physiotherapy started, replacement discussed for later."},
+            {"date": "2026-05-08", "doctor": "Dr. Mizanur Rahman", "specialty": "Cardiology",
+             "diagnosis": "Stable angina", "notes": "Echo shows preserved function. Continue current medication."},
+            {"date": "2026-02-14", "doctor": "Dr. Shamsul Alam", "specialty": "Medicine",
+             "diagnosis": "Annual review — diabetes and BP",
+             "notes": "Both reasonably controlled. Kidney function stable."},
+            {"date": "2025-10-03", "doctor": "Dr. Delwar Hossain", "specialty": "Neuro Medicine",
+             "diagnosis": "Peripheral neuropathy", "notes": "Diabetes-related. Started on gabapentin."},
+        ],
+        "reports": [
+            {"name": "Knee X-Ray", "date": "2026-07-15", "type": "PDF"},
+            {"name": "Echocardiogram", "date": "2026-05-08", "type": "PDF"},
+            {"name": "Kidney Function Test", "date": "2026-02-14", "type": "PDF"},
+            {"name": "HbA1c Report", "date": "2026-02-14", "type": "PDF"},
+        ],
+    },
+]
+PATIENTS += DEMO_PATIENTS
+
+# Three more consultants, one each in the busiest departments.
+DOCTORS += [
+    ("Dr. Sabbir Ahmed", "Medicine", "MBBS, MD (Internal Medicine)", 10, "sabbir.ahmed@moh-hospital.example",
+     "+880 1711-000161", ["Sun", "Mon", "Tue", "Wed", "Thu"], "09:00 - 16:00",
+     "Splits his week between the general clinic and the diabetes follow-up list.", 580, ["Bengali", "English"], "109"),
+    ("Dr. Ruhul Amin", "Cardiology", "MBBS, MD (Cardiology)", 12, "ruhul.amin@moh-hospital.example",
+     "+880 1711-000162", ["Sat", "Sun", "Tue", "Thu", "Fri"], "10:00 - 18:00",
+     "Took over the hypertension clinic last year. Sees a lot of first-time referrals.", 780, ["Bengali", "English"], "207"),
+    ("Dr. Sharmin Akter", "Obs & Gynae", "MBBS, FCPS (Gynae & Obs)", 8, "sharmin.akter@moh-hospital.example",
+     "+880 1711-000163", ["Sun", "Mon", "Wed", "Thu", "Sat"], "09:00 - 15:00",
+     "Mostly antenatal clinics, with a half-day of general gynae consults on Thursdays.", 720, ["Bengali", "English"], "607"),
+]
 
 # 39 more admin accounts on top of the original one (40 total), spread
 # across the departments that actually run a hospital's back office.
@@ -411,6 +513,19 @@ def _generate_extra_admins():
         })
     return admins
 
+
+DEMO_ADMINS = [
+    {"name": "Tanvir Alam", "email": "tanvir.alam@moh-hospital.example", "role": "Super Admin",
+     "avatar_initials": "TA", "phone": "+880 1811-200001", "department": "Operations",
+     "join_date": "2019-06-01"},
+    {"name": "Mehnaz Karim", "email": "mehnaz.karim@moh-hospital.example", "role": "Admin",
+     "avatar_initials": "MK", "phone": "+880 1811-200002", "department": "Patient Records",
+     "join_date": "2022-02-15"},
+    {"name": "Sohel Rana", "email": "sohel.rana@moh-hospital.example", "role": "Admin",
+     "avatar_initials": "SR", "phone": "+880 1811-200003", "department": "Front Desk",
+     "join_date": "2023-09-04"},
+]
+
 PACKAGES = [
     {"name": "Executive Health Checkup", "price": 4500,
      "tests": ["CBC", "Lipid Profile", "Liver Function Test", "ECG", "Chest X-Ray"],
@@ -442,6 +557,27 @@ _QUEUE_DEPTH_CHOICES = [1, 2, 3, 4, 5, 6, 7, 8]
 _QUEUE_DEPTH_WEIGHTS = [22, 22, 18, 14, 10, 7, 4, 3]
 _WALK_IN_NAMES = ["Walk-in Patient", "Walk-in Visitor", "Golam Mostofa", "Rina Begum", "Nazrul Sarkar"]
 
+# What people actually write on the slip when they book, per department.
+_VISIT_REASONS = {
+    "Cardiology": ["Chest pain — needs urgent review", "Follow-up — hypertension management",
+                   "ECG review & consult", "Palpitations, new consult", "Post-op follow-up",
+                   "Routine check-up"],
+    "Paediatrics": ["Fever for 3 days", "Vaccination due", "Routine growth check",
+                    "Persistent cough", "Rash — needs review", "Feeding difficulty"],
+    "Orthopaedics": ["Knee pain — worsening", "Post-fracture follow-up", "Back pain review",
+                     "Shoulder injury", "Cast removal", "Physiotherapy referral"],
+    "Neuro Medicine": ["Recurring headaches", "Seizure follow-up", "Numbness in left arm",
+                       "Post-stroke review", "Dizziness & balance issues", "Medication review"],
+    "Dermatology": ["Persistent rash", "Acne consultation", "Hair fall — 6 months",
+                    "Mole check", "Eczema flare-up", "Follow-up on prescription"],
+    "ENT": ["Ear pain & discharge", "Sore throat — 2 weeks", "Hearing test follow-up",
+            "Sinus congestion", "Snoring / sleep issues", "Tonsil review"],
+    "Obs & Gynae": ["Antenatal check-up", "Irregular cycles", "Post-natal follow-up",
+                    "Ultrasound review", "Family planning consult", "Routine screening"],
+    "Medicine": ["Fever & body ache", "Diabetes follow-up", "Blood pressure check",
+                 "Stomach pain", "General check-up", "Report review"],
+}
+
 
 def _generate_live_queue(doctor_records, patient_records, rng_seed=2026):
     """doctor_records: list of (doctor_id, specialty_name) tuples.
@@ -455,6 +591,9 @@ def _generate_live_queue(doctor_records, patient_records, rng_seed=2026):
     patient_cursor = 0
     counter = 1
     tokens = []
+    # Nobody can be sitting in two queues at once, so once a patient is placed
+    # they're out of the running for every other doctor today.
+    already_queued = set()
 
     for doctor_id, specialty_name in doctor_records:
         demand = _SPECIALTY_DEMAND.get(specialty_name, 0.4)
@@ -463,7 +602,9 @@ def _generate_live_queue(doctor_records, patient_records, rng_seed=2026):
             continue  # quiet day for this doctor - nobody in queue right now
 
         depth = rng.choices(_QUEUE_DEPTH_CHOICES, weights=_QUEUE_DEPTH_WEIGHTS)[0]
-        statuses = []
+        # By mid-morning a busy doctor has already finished a few consultations,
+        # so the "seen today" counter shouldn't sit at zero all day.
+        statuses = ["completed"] * rng.randint(2, 9)
         if rng.random() < 0.55:
             statuses.append("in-consultation")
             depth -= 1
@@ -479,14 +620,28 @@ def _generate_live_queue(doctor_records, patient_records, rng_seed=2026):
             elif rng.random() < 0.10:
                 token_type = "walk-in"
 
+            # A finished visit doesn't tie the patient up, but an active one does.
+            blocks_patient = status != "completed"
+
             if token_type == "walk-in" or rng.random() < 0.15:
                 patient_id, patient_name = None, rng.choice(_WALK_IN_NAMES)
             else:
-                patient_id, patient_name = patient_pool[patient_cursor % len(patient_pool)]
-                patient_cursor += 1
+                patient_id, patient_name = None, None
+                for _ in range(len(patient_pool)):
+                    candidate_id, candidate_name = patient_pool[patient_cursor % len(patient_pool)]
+                    patient_cursor += 1
+                    if candidate_id not in already_queued:
+                        patient_id, patient_name = candidate_id, candidate_name
+                        if blocks_patient:
+                            already_queued.add(candidate_id)
+                        break
+                if patient_id is None:
+                    # Everyone registered is already in a queue somewhere today.
+                    patient_name = rng.choice(_WALK_IN_NAMES)
 
             hour = 9 + idx // 2
             minute = (idx * 17) % 60
+            reasons = _VISIT_REASONS.get(specialty_name, ["General consultation"])
             tokens.append({
                 "token_number": f"Q-{counter:03d}",
                 "doctor_id": doctor_id,
@@ -494,8 +649,10 @@ def _generate_live_queue(doctor_records, patient_records, rng_seed=2026):
                 "patient_name": patient_name,
                 "type": token_type,
                 "status": status,
-                "booked_at": f"2026-07-30T{hour:02d}:{minute:02d}:00",
+                "booked_at": f"{TODAY}T{hour:02d}:{minute:02d}:00",
                 "slot_time": f"{hour:02d}:{(minute + 15) % 60:02d}",
+                "reason": rng.choice(reasons),
+                "checked_in_at": f"{TODAY}T{hour:02d}:{minute:02d}:00",
             })
             counter += 1
 
@@ -555,7 +712,7 @@ async def main():
         "department": "Operations",
         "join_date": "2020-01-01",
     }]
-    for a in _generate_extra_admins():
+    for a in _generate_extra_admins() + DEMO_ADMINS:
         admin_docs.append({**a, "password_hash": hash_password(ADMIN_DEMO_PASSWORD)})
     await admins_col.insert_many(admin_docs)
 
@@ -568,20 +725,68 @@ async def main():
     sample_tokens = [
         {"token_number": "A-014", "doctor_id": farhana_id, "patient_id": patient_ids["Abdullah Al Mamun"],
          "patient_name": "Abdullah Al Mamun", "type": "regular", "status": "in-consultation",
-         "booked_at": "2026-07-30T08:10:00", "slot_time": "09:20"},
+         "booked_at": f"{TODAY}T08:10:00", "slot_time": "09:20",
+         "reason": "Follow-up — hypertension management", "checked_in_at": f"{TODAY}T09:12:00"},
         {"token_number": "A-015", "doctor_id": farhana_id, "patient_id": patient_ids["Rakibul Islam"],
          "patient_name": "Rakibul Islam", "type": "emergency", "status": "waiting",
-         "booked_at": "2026-07-30T09:05:00", "slot_time": "09:40"},
+         "booked_at": f"{TODAY}T09:05:00", "slot_time": "09:40",
+         "reason": "Chest pain — needs urgent review", "checked_in_at": f"{TODAY}T09:30:00"},
         {"token_number": "A-016", "doctor_id": farhana_id, "patient_id": None,
          "patient_name": "Golam Mostofa", "type": "walk-in", "status": "waiting",
-         "booked_at": "2026-07-30T09:15:00", "slot_time": "09:45"},
+         "booked_at": f"{TODAY}T09:15:00", "slot_time": "09:45",
+         "reason": "Palpitations, new consult", "checked_in_at": f"{TODAY}T09:40:00"},
+        # Booked the night before for a morning slot — the wait clock still
+        # starts when they physically check in, not when they booked.
         {"token_number": "A-017", "doctor_id": farhana_id, "patient_id": patient_ids["Tania Ferdous"],
          "patient_name": "Tania Ferdous", "type": "regular", "status": "waiting",
-         "booked_at": "2026-07-29T18:30:00", "slot_time": "10:00"},
+         "booked_at": f"{YESTERDAY}T18:30:00", "slot_time": "10:00",
+         "reason": "ECG review & consult", "checked_in_at": f"{TODAY}T09:55:00"},
         {"token_number": "B-008", "doctor_id": nusrat_id, "patient_id": patient_ids["Nasrin Sultana"],
          "patient_name": "Nasrin Sultana", "type": "regular", "status": "completed",
-         "booked_at": "2026-07-30T08:00:00", "slot_time": "08:30"},
+         "booked_at": f"{TODAY}T08:00:00", "slot_time": "08:30",
+         "reason": "Routine child wellness visit", "checked_in_at": f"{TODAY}T08:20:00"},
     ]
+
+    # Farhana and Nusrat sit outside the generated queue, so give them the
+    # morning's finished consultations too — otherwise their "seen today"
+    # counter reads zero while they're mid-consultation.
+    _morning_done = [
+        (farhana_id, "Kamal Uddin", "Post-op follow-up", "08:00"),
+        (farhana_id, "Rowshan Ara Begum", "Routine check-up", "08:20"),
+        (farhana_id, "Jahangir Alam", "Follow-up — hypertension management", "08:40"),
+        (nusrat_id, "Sumaiya Akter", "Vaccination due", "08:45"),
+        (nusrat_id, "Rafi Ahmed", "Fever for 3 days", "09:05"),
+    ]
+    for _n, (_doc_id, _name, _reason, _slot) in enumerate(_morning_done):
+        sample_tokens.append({
+            "token_number": f"M-{400 + _n}", "doctor_id": _doc_id, "patient_id": None,
+            "patient_name": _name, "type": "regular", "status": "completed",
+            "booked_at": f"{TODAY}T07:{30 + _n:02d}:00", "slot_time": _slot,
+            "reason": _reason, "checked_in_at": f"{TODAY}T07:{45 + _n:02d}:00",
+        })
+
+    # Every entry in a patient's medical history was a real visit once, so give
+    # each one a matching completed token. Without this the four hand-written
+    # patients show "0 visits" on their dashboard while listing past diagnoses.
+    history_counter = 0
+    for patient in PATIENTS[:4]:
+        for entry in patient.get("medical_history", []):
+            doctor_id = doctor_ids.get(entry["doctor"])
+            if not doctor_id:
+                continue
+            history_counter += 1
+            sample_tokens.append({
+                "token_number": f"P-{300 + history_counter}",
+                "doctor_id": doctor_id,
+                "patient_id": patient_ids[patient["name"]],
+                "patient_name": patient["name"],
+                "type": "regular",
+                "status": "completed",
+                "booked_at": f"{entry['date']}T09:00:00",
+                "slot_time": "09:30",
+                "reason": entry["diagnosis"],
+                "checked_in_at": f"{entry['date']}T09:00:00",
+            })
 
     # A spread of past bookings across the extra patients, covering every
     # status (including skipped/no-show) so booking history has real depth.
@@ -613,7 +818,16 @@ async def main():
         for name, specialty_name, *_rest in DOCTORS
         if name not in already_seeded_doctors
     ]
-    patient_records = [(pid, name) for name, pid in patient_ids.items()]
+    # Patients already sitting in a hand-placed queue above must not be handed
+    # a second token by the generator.
+    active_statuses = {"waiting", "called", "in-consultation"}
+    busy_patient_ids = {
+        t["patient_id"] for t in sample_tokens
+        if t["patient_id"] and t["status"] in active_statuses
+    }
+    patient_records = [
+        (pid, name) for name, pid in patient_ids.items() if pid not in busy_patient_ids
+    ]
     live_queue_tokens = _generate_live_queue(doctor_specialty_pairs, patient_records)
     sample_tokens.extend(live_queue_tokens)
     busy_doctors = len({t["doctor_id"] for t in live_queue_tokens})
@@ -626,10 +840,10 @@ async def main():
     await notifications_col.insert_many([
         {"role": "patient", "profile_id": patient_ids["Abdullah Al Mamun"], "title": "Token confirmed",
          "body": "Your token A-014 with Dr. Farhana Kabir is confirmed for today.",
-         "time": "2026-07-30T08:10:00", "read": False},
+         "time": f"{TODAY}T08:10:00", "read": False},
         {"role": "doctor", "profile_id": farhana_id, "title": "Emergency token added",
          "body": "An emergency token (A-015) was added to your queue.",
-         "time": "2026-07-30T09:05:00", "read": False},
+         "time": f"{TODAY}T09:05:00", "read": False},
     ])
 
     print(f"Done. {len(doctor_ids)} doctors, {len(patient_ids)} patients, "

@@ -34,12 +34,20 @@
   }
 }
 
+.pageTitle {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin: 0;
+  white-space: nowrap;
+  margin-right: auto;
+}
+
 .search {
   display: flex;
   align-items: center;
   gap: 8px;
-  width: 260px;
-  max-width: 40vw;
+  width: 280px;
+  max-width: 32vw;
   background: var(--shq-bg);
   border: 1px solid var(--shq-border);
   border-radius: 8px;
@@ -134,14 +142,22 @@
 .profileRole {
   font-size: 0.72rem;
   color: var(--shq-text-secondary);
-  text-transform: capitalize;
+}
+
+@media (max-width: 991px) {
+  .pageTitle {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .search {
+    display: none;
+  }
 }
 
 @media (max-width: 576px) {
   .profileText {
-    display: none;
-  }
-  .search {
     display: none;
   }
 }

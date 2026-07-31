@@ -121,15 +121,27 @@ etc.) with a MongoDB connection string in its environment.
 
 ## Demo Logins
 
-`seed.py` loads 60 doctors (varying 6-10 per specialty), 40 patients, and 40 admins.
-Every seeded account in a given role shares the same password, so any of them will
-get you in:
+`seed.py` loads 63 doctors (6-10 per specialty), 43 patients, and 43 admins. Every
+seeded account in a given role shares the same password, so any of them will get
+you in. These are good ones to start with:
 
-| Role    | Password    | A few of the 40-60 seeded emails                                            |
-|---------|-------------|-------------------------------------------------------------------------------|
-| Patient | password123 | abdullah.mamun@example.com, nasrin.sultana@example.com, rakibul.islam@example.com |
-| Doctor  | doctor123   | farhana.kabir@moh-hospital.example, kamrul.hasan@moh-hospital.example (full list: `GET /doctors` or **Admin → Doctors**) |
-| Admin   | admin123    | admin@moh-hospital.example (Super Admin), md.nurul.islam@moh-hospital.example (full list: **Admin → Admins**) |
+| Role    | Email                                | Password    | Notes |
+|---------|--------------------------------------|-------------|-------|
+| Patient | abdullah.mamun@example.com           | password123 | Mid-consultation with Cardiology right now |
+| Patient | anwar.khan@example.com               | password123 | Long file — 4 past visits, 4 reports |
+| Patient | imran.chowdhury@example.com          | password123 | Diabetes + cardiology follow-ups |
+| Patient | sadia.rahman@example.com             | password123 | Lighter record, 2 visits |
+| Doctor  | farhana.kabir@moh-hospital.example   | doctor123   | Cardiology, busy queue + someone in consultation |
+| Doctor  | ruhul.amin@moh-hospital.example      | doctor123   | Cardiology, hypertension clinic |
+| Doctor  | sabbir.ahmed@moh-hospital.example    | doctor123   | Medicine, general + diabetes list |
+| Doctor  | sharmin.akter@moh-hospital.example   | doctor123   | Obs & Gynae, antenatal clinics |
+| Admin   | admin@moh-hospital.example           | admin123    | Super Admin |
+| Admin   | tanvir.alam@moh-hospital.example     | admin123    | Super Admin, Operations |
+| Admin   | mehnaz.karim@moh-hospital.example    | admin123    | Admin, Patient Records |
+| Admin   | sohel.rana@moh-hospital.example      | admin123    | Admin, Front Desk |
+
+For the full rosters see **Admin → Doctors**, **Admin → Patients**, and
+**Admin → Admins** in the app (or `GET /doctors` for the doctor list).
 
 New patient accounts can also be created via **Register**. Doctor and Admin accounts
 are provisioned by an Admin — **Admin → Doctors → Add Doctor** or **Admin → Admins →

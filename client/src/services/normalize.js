@@ -69,6 +69,7 @@ export function normalizePatient(p) {
     bloodGroup: p.blood_group,
     address: p.address,
     avatarInitials: p.avatar_initials,
+    mrn: p.mrn || '',
     medicalHistory: p.medical_history || [],
     reports: p.reports || [],
   }
@@ -98,6 +99,8 @@ export function normalizeToken(t) {
     status: t.status,
     bookedAt: t.booked_at,
     slotTime: t.slot_time,
+    reason: t.reason || '',
+    checkedInAt: t.checked_in_at || '',
   }
 }
 
