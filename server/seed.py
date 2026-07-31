@@ -15,7 +15,7 @@ Usage:
 
 import asyncio
 import random
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta, timezone
 
 from app.core.security import hash_password
 from app.database import (
@@ -579,82 +579,110 @@ _VISIT_REASONS = {
 }
 
 
+def _has_patients_today(rng, specialty_name):
+    """Busier departments see patients more often. Each doctor also gets a
+    personal nudge, so two cardiologists don't have identical days."""
+    demand = _SPECIALTY_DEMAND.get(specialty_name, 0.4)
+    personal_pace = rng.uniform(0.7, 1.3)
+    return rng.random() < min(demand * personal_pace, 0.95)
+
+
+def _todays_statuses(rng):
+    """One entry per token this doctor has today, in the order they were seen:
+    a few already finished, maybe one patient in the room now, then the queue
+    still waiting."""
+    statuses = ["completed"] * rng.randint(2, 9)
+
+    queue_length = rng.choices(_QUEUE_DEPTH_CHOICES, weights=_QUEUE_DEPTH_WEIGHTS)[0]
+    if rng.random() < 0.55:
+        statuses.append("in-consultation")
+        queue_length -= 1
+    if queue_length > 0:
+        statuses.append("called")
+        queue_length -= 1
+    statuses.extend(["waiting"] * max(queue_length, 0))
+
+    return statuses
+
+
+def _pick_token_type(rng):
+    roll = rng.random()
+    if roll < 0.08:
+        return "emergency"
+    if roll < 0.18:
+        return "walk-in"
+    return "regular"
+
+
+def _pick_patient(rng, free_patients, status):
+    """Returns (patient_id, patient_name). Walk-ins and some visitors have no
+    account — they just give a name at the desk, so patient_id is None.
+
+    A patient who is still waiting or in the room can't also be queued for
+    another doctor, so they get taken off the list. Someone whose visit has
+    already finished is free to appear elsewhere."""
+    if not free_patients or rng.random() < 0.15:
+        return None, rng.choice(_WALK_IN_NAMES)
+    if status == "completed":
+        return rng.choice(free_patients)
+    return free_patients.pop()
+
+
+def _visit_day(token):
+    """The day the patient is actually seen, which isn't always the day they
+    booked — someone can book tonight for tomorrow morning. Check-in time is
+    the better signal when we have it."""
+    stamp = token.get("checked_in_at") or token["booked_at"]
+    return stamp[:10]
+
+
 def _generate_live_queue(doctor_records, patient_records, rng_seed=2026):
-    """doctor_records: list of (doctor_id, specialty_name) tuples.
-    patient_records: list of (patient_id, patient_name) tuples.
-    Returns today's "right now" queue tokens — some doctors busy, some idle,
-    depth and mix varying by specialty demand and per-doctor luck, so it
-    doesn't look like every doctor runs an identical day."""
+    """Builds today's queue across all doctors, so the app opens on a hospital
+    mid-morning rather than an empty one. Some doctors are busy, some are
+    idle, and queue depth varies by department.
+
+    doctor_records: (doctor_id, specialty_name) tuples
+    patient_records: (patient_id, patient_name) tuples
+    """
     rng = random.Random(rng_seed)
-    patient_pool = list(patient_records)
-    rng.shuffle(patient_pool)
-    patient_cursor = 0
-    counter = 1
+
+    # Patients still available to be put in a queue. Handing them out from one
+    # shared list is what stops the same person appearing in two queues.
+    free_patients = list(patient_records)
+    rng.shuffle(free_patients)
+
     tokens = []
-    # Nobody can be sitting in two queues at once, so once a patient is placed
-    # they're out of the running for every other doctor today.
-    already_queued = set()
 
     for doctor_id, specialty_name in doctor_records:
-        demand = _SPECIALTY_DEMAND.get(specialty_name, 0.4)
-        doctor_modifier = rng.uniform(0.7, 1.3)  # some doctors just run busier than their peers
-        if rng.random() >= min(demand * doctor_modifier, 0.95):
-            continue  # quiet day for this doctor - nobody in queue right now
+        if not _has_patients_today(rng, specialty_name):
+            continue
 
-        depth = rng.choices(_QUEUE_DEPTH_CHOICES, weights=_QUEUE_DEPTH_WEIGHTS)[0]
-        # By mid-morning a busy doctor has already finished a few consultations,
-        # so the "seen today" counter shouldn't sit at zero all day.
-        statuses = ["completed"] * rng.randint(2, 9)
-        if rng.random() < 0.55:
-            statuses.append("in-consultation")
-            depth -= 1
-        if depth > 0:
-            statuses.append("called")
-            depth -= 1
-        statuses.extend(["waiting"] * max(depth, 0))
+        reasons = _VISIT_REASONS.get(specialty_name, ["General consultation"])
 
-        for idx, status in enumerate(statuses):
-            token_type = "regular"
-            if rng.random() < 0.08:
-                token_type = "emergency"
-            elif rng.random() < 0.10:
-                token_type = "walk-in"
-
-            # A finished visit doesn't tie the patient up, but an active one does.
-            blocks_patient = status != "completed"
-
-            if token_type == "walk-in" or rng.random() < 0.15:
+        for position, status in enumerate(_todays_statuses(rng)):
+            token_type = _pick_token_type(rng)
+            if token_type == "walk-in":
                 patient_id, patient_name = None, rng.choice(_WALK_IN_NAMES)
             else:
-                patient_id, patient_name = None, None
-                for _ in range(len(patient_pool)):
-                    candidate_id, candidate_name = patient_pool[patient_cursor % len(patient_pool)]
-                    patient_cursor += 1
-                    if candidate_id not in already_queued:
-                        patient_id, patient_name = candidate_id, candidate_name
-                        if blocks_patient:
-                            already_queued.add(candidate_id)
-                        break
-                if patient_id is None:
-                    # Everyone registered is already in a queue somewhere today.
-                    patient_name = rng.choice(_WALK_IN_NAMES)
+                patient_id, patient_name = _pick_patient(rng, free_patients, status)
 
-            hour = 9 + idx // 2
-            minute = (idx * 17) % 60
-            reasons = _VISIT_REASONS.get(specialty_name, ["General consultation"])
+            # Roughly two patients an hour from 9am, which keeps the timestamps
+            # believable without needing a real scheduler.
+            hour = 9 + position // 2
+            minute = (position * 17) % 60
+            booked_at = f"{TODAY}T{hour:02d}:{minute:02d}:00"
+
             tokens.append({
-                "token_number": f"Q-{counter:03d}",
                 "doctor_id": doctor_id,
                 "patient_id": patient_id,
                 "patient_name": patient_name,
                 "type": token_type,
                 "status": status,
-                "booked_at": f"{TODAY}T{hour:02d}:{minute:02d}:00",
+                "booked_at": booked_at,
                 "slot_time": f"{hour:02d}:{(minute + 15) % 60:02d}",
                 "reason": rng.choice(reasons),
-                "checked_in_at": f"{TODAY}T{hour:02d}:{minute:02d}:00",
+                "checked_in_at": booked_at,
             })
-            counter += 1
 
     return tokens
 
@@ -723,25 +751,25 @@ async def main():
     farhana_id = doctor_ids["Dr. Farhana Kabir"]
     nusrat_id = doctor_ids["Dr. Nusrat Jahan"]
     sample_tokens = [
-        {"token_number": "A-014", "doctor_id": farhana_id, "patient_id": patient_ids["Abdullah Al Mamun"],
+        {"doctor_id": farhana_id, "patient_id": patient_ids["Abdullah Al Mamun"],
          "patient_name": "Abdullah Al Mamun", "type": "regular", "status": "in-consultation",
          "booked_at": f"{TODAY}T08:10:00", "slot_time": "09:20",
          "reason": "Follow-up — hypertension management", "checked_in_at": f"{TODAY}T09:12:00"},
-        {"token_number": "A-015", "doctor_id": farhana_id, "patient_id": patient_ids["Rakibul Islam"],
+        {"doctor_id": farhana_id, "patient_id": patient_ids["Rakibul Islam"],
          "patient_name": "Rakibul Islam", "type": "emergency", "status": "waiting",
          "booked_at": f"{TODAY}T09:05:00", "slot_time": "09:40",
          "reason": "Chest pain — needs urgent review", "checked_in_at": f"{TODAY}T09:30:00"},
-        {"token_number": "A-016", "doctor_id": farhana_id, "patient_id": None,
+        {"doctor_id": farhana_id, "patient_id": None,
          "patient_name": "Golam Mostofa", "type": "walk-in", "status": "waiting",
          "booked_at": f"{TODAY}T09:15:00", "slot_time": "09:45",
          "reason": "Palpitations, new consult", "checked_in_at": f"{TODAY}T09:40:00"},
         # Booked the night before for a morning slot — the wait clock still
         # starts when they physically check in, not when they booked.
-        {"token_number": "A-017", "doctor_id": farhana_id, "patient_id": patient_ids["Tania Ferdous"],
+        {"doctor_id": farhana_id, "patient_id": patient_ids["Tania Ferdous"],
          "patient_name": "Tania Ferdous", "type": "regular", "status": "waiting",
          "booked_at": f"{YESTERDAY}T18:30:00", "slot_time": "10:00",
          "reason": "ECG review & consult", "checked_in_at": f"{TODAY}T09:55:00"},
-        {"token_number": "B-008", "doctor_id": nusrat_id, "patient_id": patient_ids["Nasrin Sultana"],
+        {"doctor_id": nusrat_id, "patient_id": patient_ids["Nasrin Sultana"],
          "patient_name": "Nasrin Sultana", "type": "regular", "status": "completed",
          "booked_at": f"{TODAY}T08:00:00", "slot_time": "08:30",
          "reason": "Routine child wellness visit", "checked_in_at": f"{TODAY}T08:20:00"},
@@ -759,7 +787,7 @@ async def main():
     ]
     for _n, (_doc_id, _name, _reason, _slot) in enumerate(_morning_done):
         sample_tokens.append({
-            "token_number": f"M-{400 + _n}", "doctor_id": _doc_id, "patient_id": None,
+            "doctor_id": _doc_id, "patient_id": None,
             "patient_name": _name, "type": "regular", "status": "completed",
             "booked_at": f"{TODAY}T07:{30 + _n:02d}:00", "slot_time": _slot,
             "reason": _reason, "checked_in_at": f"{TODAY}T07:{45 + _n:02d}:00",
@@ -768,15 +796,12 @@ async def main():
     # Every entry in a patient's medical history was a real visit once, so give
     # each one a matching completed token. Without this the four hand-written
     # patients show "0 visits" on their dashboard while listing past diagnoses.
-    history_counter = 0
     for patient in PATIENTS[:4]:
         for entry in patient.get("medical_history", []):
             doctor_id = doctor_ids.get(entry["doctor"])
             if not doctor_id:
                 continue
-            history_counter += 1
             sample_tokens.append({
-                "token_number": f"P-{300 + history_counter}",
                 "doctor_id": doctor_id,
                 "patient_id": patient_ids[patient["name"]],
                 "patient_name": patient["name"],
@@ -797,7 +822,6 @@ async def main():
         status = booking_statuses[i % len(booking_statuses)]
         doctor_id = doctor_id_list[i % len(doctor_id_list)]
         sample_tokens.append({
-            "token_number": f"H-{200 + i}",
             "doctor_id": doctor_id,
             "patient_id": patient_ids[patient_name],
             "patient_name": patient_name,
@@ -833,6 +857,30 @@ async def main():
     busy_doctors = len({t["doctor_id"] for t in live_queue_tokens})
     print(f"  {len(live_queue_tokens)} live tokens across {busy_doctors} of {len(doctor_ids)} doctors "
           f"({len(doctor_ids) - busy_doctors} quiet today).")
+
+    # One numbering rule for every token above, whether it was hand-written or
+    # generated: each doctor numbers their own patients from T-001 each day, in
+    # slot order. This is the same rule _next_token_number applies in
+    # app/routers/tokens.py when a real booking comes in, so seeded and
+    # live-booked tokens look identical. Two doctors both having a T-001 is
+    # expected — the number is only unique within one doctor's day.
+    day_sequence = {}
+    for token in sorted(sample_tokens, key=lambda t: (_visit_day(t), t["slot_time"])):
+        key = (token["doctor_id"], _visit_day(token))
+        day_sequence[key] = day_sequence.get(key, 0) + 1
+        token["token_number"] = f"T-{day_sequence[key]:03d}"
+
+    # The queue screens show "waiting 12 min", counted from check-in. Seeding a
+    # fixed 09:00 check-in means running this in the evening shows people who
+    # have apparently been waiting 800 minutes, so anchor anyone still in a
+    # queue to the current clock instead. Finished visits keep their real times.
+    still_waiting = {"waiting", "called", "in-consultation"}
+    now = datetime.now(timezone.utc)
+    waiting_rng = random.Random(7)
+    for token in sample_tokens:
+        if token["status"] in still_waiting:
+            minutes_ago = waiting_rng.randint(3, 55)
+            token["checked_in_at"] = (now - timedelta(minutes=minutes_ago)).isoformat()
 
     await tokens_col.insert_many(sample_tokens)
 

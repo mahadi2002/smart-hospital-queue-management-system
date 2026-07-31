@@ -16,9 +16,18 @@ DOCTOR_ACTIONS = {"called", "in-consultation", "skipped", "no-show"}
 
 
 async def _next_token_number(doctor_id: str) -> str:
-    count = await tokens_col.count_documents({})
-    suffix = doctor_id[-4:]
-    return f"T{suffix}-{100 + count}"
+    """Numbers restart at 1 for each doctor each day, the way a real counter
+    works — you're "number 7 for Dr. Rahman today", not number 4,213 since the
+    system was installed. Two doctors both having a T-007 is fine and expected.
+
+    Known limitation: two people booking in the very same instant could get the
+    same number. A production system would use an atomic per-doctor counter.
+    """
+    today = now_iso()[:10]
+    booked_today = await tokens_col.count_documents(
+        {"doctor_id": doctor_id, "booked_at": {"$regex": f"^{today}"}}
+    )
+    return f"T-{booked_today + 1:03d}"
 
 
 @router.get("")
