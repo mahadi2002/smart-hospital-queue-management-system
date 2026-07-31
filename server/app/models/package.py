@@ -15,6 +15,13 @@ class PackageReserve(BaseModel):
     email: str | None = None
 
 
+RESERVATION_STATUSES = ["pending", "confirmed", "cancelled"]
+
+
+class ReservationStatusUpdate(BaseModel):
+    status: str
+
+
 class PackageReservationOut(BaseModel):
     id: str
     package_id: str

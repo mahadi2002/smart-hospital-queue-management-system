@@ -1,13 +1,19 @@
 import { useEffect, useState } from 'react'
-import { FileBarChart, Download, FileSpreadsheet, Phone } from 'lucide-react'
+import { FileBarChart, Download, FileSpreadsheet, Phone, Check, X } from 'lucide-react'
 import Card from '../../components/ui/Card'
 import api from '../../services/api'
 import { normalizePackageReservation } from '../../services/normalize'
 import { useQueue } from '../../context/QueueContext'
 import { useDirectory } from '../../context/DirectoryContext'
 import { formatDateTime } from '../../utils/format'
-import { showToast } from '../../utils/toast'
+import { showConfirm, showError, showToast } from '../../utils/toast'
 import { TOKEN_STATUS } from '../../constants/tokenStatus'
+
+const RESERVATION_BADGE = {
+  pending: { bg: '#fef3c7', color: '#92400e' },
+  confirmed: { bg: '#dcfce7', color: '#166534' },
+  cancelled: { bg: '#f3f4f6', color: '#6b7280' },
+}
 
 const REPORT_TYPES = [
   { id: 'daily-queue', name: 'Daily Queue Summary', description: 'Tokens issued, completed, and no-shows per doctor today.' },
@@ -23,6 +29,25 @@ export default function Reports() {
   useEffect(() => {
     api.get('/packages/reservations').then(({ data }) => setReservations(data.map(normalizePackageReservation)))
   }, [])
+
+  async function setReservationStatus(reservation, nextStatus) {
+    if (nextStatus === 'cancelled') {
+      const confirmed = await showConfirm({
+        title: 'Cancel this reservation?',
+        text: `${reservation.name}'s booking for ${reservation.packageName} will be marked cancelled.`,
+        confirmText: 'Cancel reservation',
+      })
+      if (!confirmed) return
+    }
+    try {
+      const { data } = await api.patch(`/packages/reservations/${reservation.id}`, { status: nextStatus })
+      const updated = normalizePackageReservation(data)
+      setReservations((prev) => prev.map((r) => (r.id === updated.id ? updated : r)))
+      showToast(nextStatus === 'confirmed' ? 'Reservation accepted.' : 'Reservation cancelled.')
+    } catch (err) {
+      showError('Could not update reservation', err.response?.data?.detail || 'Something went wrong.')
+    }
+  }
 
   function handleGenerate(report) {
     showToast(`${report.name} generated.`)
@@ -107,24 +132,55 @@ export default function Reports() {
                   <th>Package</th>
                   <th>Reserved</th>
                   <th>Status</th>
+                  <th className="text-end">Action</th>
                 </tr>
               </thead>
               <tbody>
-                {reservations.map((r) => (
-                  <tr key={r.id}>
-                    <td className="fw-semibold">{r.name}</td>
-                    <td>
-                      <a href={`tel:${r.phone}`} className="link-shq d-inline-flex align-items-center gap-1">
-                        <Phone size={13} /> {r.phone}
-                      </a>
-                    </td>
-                    <td className="text-shq-secondary small">{r.packageName}</td>
-                    <td className="text-shq-secondary small">{formatDateTime(r.createdAt)}</td>
-                    <td>
-                      <span className="badge bg-warning-subtle text-warning-emphasis text-capitalize">{r.status}</span>
-                    </td>
-                  </tr>
-                ))}
+                {reservations.map((r) => {
+                  const badge = RESERVATION_BADGE[r.status] || RESERVATION_BADGE.pending
+                  return (
+                    <tr key={r.id}>
+                      <td className="fw-semibold">{r.name}</td>
+                      <td>
+                        <a href={`tel:${r.phone}`} className="link-shq d-inline-flex align-items-center gap-1">
+                          <Phone size={13} /> {r.phone}
+                        </a>
+                      </td>
+                      <td className="text-shq-secondary small">{r.packageName}</td>
+                      <td className="text-shq-secondary small">{formatDateTime(r.createdAt)}</td>
+                      <td>
+                        <span
+                          className="badge text-capitalize"
+                          style={{ background: badge.bg, color: badge.color }}
+                        >
+                          {r.status}
+                        </span>
+                      </td>
+                      <td className="text-end">
+                        <div className="d-flex gap-2 justify-content-end">
+                          {r.status !== 'confirmed' && (
+                            <button
+                              className="btn btn-success btn-sm"
+                              onClick={() => setReservationStatus(r, 'confirmed')}
+                            >
+                              <Check size={14} className="me-1" />
+                              Accept
+                            </button>
+                          )}
+                          {r.status !== 'cancelled' && (
+                            <button
+                              className="btn btn-outline-secondary btn-sm"
+                              onClick={() => setReservationStatus(r, 'cancelled')}
+                            >
+                              <X size={14} className="me-1" />
+                              Cancel
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
           </div>

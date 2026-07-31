@@ -127,10 +127,11 @@
      sidebar. The list still scrolls. */
   scrollbar-width: none;
   -ms-overflow-style: none;
-  /* Fade the last rows out instead of letting them run under the support
-     card pinned at the bottom. */
-  mask-image: linear-gradient(to bottom, #000 calc(100% - 56px), transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 56px), transparent 100%);
+  /* The support card and logout button are pinned over the bottom ~125px of
+     this list, so scrolled rows have to be fully faded out before they reach
+     that far rather than sliding underneath and showing through. */
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 180px), transparent calc(100% - 128px));
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 180px), transparent calc(100% - 128px));
 }
 
 .nav::-webkit-scrollbar {
@@ -153,6 +154,23 @@
 
 .navLink:hover {
   background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+/* The patient menu stays flat — only the page you're actually on is
+   highlighted, so nothing moves under the cursor. */
+.sidebar--patient .navLink {
+  transition: none;
+}
+
+.sidebar--patient .navLink:hover {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.sidebar--patient .navLinkActive,
+.sidebar--patient .navLinkActive:hover {
+  background: rgba(255, 255, 255, 0.18);
   color: #fff;
 }
 
