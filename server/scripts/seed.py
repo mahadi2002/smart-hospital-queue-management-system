@@ -48,212 +48,227 @@ DOCTOR_DEMO_PASSWORD = "doctor123"
 PATIENT_DEMO_PASSWORD = "password123"
 ADMIN_DEMO_PASSWORD = "admin123"
 
+# Every account logs in with its own name-based address, but these few also
+# answer to a short alias so a demo doesn't involve spelling out a full name.
+# (collection, account name, alias)
+DEMO_ALIASES = [
+    ("doctors", "Dr. Farhana Kabir", "doctor1@sobh.com"),
+    ("doctors", "Dr. Nusrat Jahan", "doctor2@sobh.com"),
+    ("doctors", "Dr. Kamrul Hasan", "doctor3@sobh.com"),
+    ("patients", "Abdullah Al Mamun", "patient1@sobh.com"),
+    ("patients", "Nasrin Sultana", "patient2@sobh.com"),
+    ("patients", "Rakibul Islam", "patient3@sobh.com"),
+    ("admins", "Md. Habibur Rahman", "admin1@sobh.com"),
+    ("admins", "Md. Nurul Islam", "admin2@sobh.com"),
+    ("admins", "Shahida Akter", "admin3@sobh.com"),
+]
+
 # Each entry: name, specialty, qualifications, experience_years, email, phone,
 # working_days, working_hours, bio, consultation_fee, languages, room_number.
 # 6-10 doctors per specialty (60 total).
 DOCTORS = [
     # --- Cardiology (Floor 2, rooms 201-206) ---
-    ("Dr. Farhana Kabir", "Cardiology", "MBBS, FCPS (Cardiology)", 14, "farhana.kabir@moh-hospital.example",
+    ("Dr. Farhana Kabir", "Cardiology", "MBBS, FCPS (Cardiology)", 14, "farhana.kabir@sobh.com",
      "+880 1711-000101", ["Sun", "Mon", "Tue", "Wed", "Thu"], "09:00 - 17:00",
      "Runs the interventional cath lab, though most of her day is preventive heart care rather than emergencies.", 900, ["Bengali", "English"], "201"),
-    ("Dr. Rezaul Karim", "Cardiology", "MBBS, MD (Cardiology)", 9, "rezaul.karim@moh-hospital.example",
+    ("Dr. Rezaul Karim", "Cardiology", "MBBS, MD (Cardiology)", 9, "rezaul.karim@sobh.com",
      "+880 1711-000102", ["Sun", "Tue", "Wed", "Thu", "Sat"], "10:00 - 18:00",
      "Sees a lot of arrhythmia cases and runs the cardiac rehab program after bypass surgery.", 700, ["Bengali", "English"], "202"),
-    ("Dr. Mizanur Rahman", "Cardiology", "MBBS, MD (Cardiology)", 16, "mizanur.rahman@moh-hospital.example",
+    ("Dr. Mizanur Rahman", "Cardiology", "MBBS, MD (Cardiology)", 16, "mizanur.rahman@sobh.com",
      "+880 1711-000117", ["Sat", "Sun", "Mon", "Wed", "Thu"], "08:00 - 15:00",
      "Does most of the echocardiograms here and follows up long-term heart failure patients.", 950, ["Bengali", "English", "Hindi"], "203"),
-    ("Dr. Shahriar Kabir", "Cardiology", "MBBS, FCPS (Cardiology)", 5, "shahriar.kabir@moh-hospital.example",
+    ("Dr. Shahriar Kabir", "Cardiology", "MBBS, FCPS (Cardiology)", 5, "shahriar.kabir@sobh.com",
      "+880 1711-000118", ["Sun", "Mon", "Tue", "Thu", "Fri"], "14:00 - 21:00",
      "Newest in the department, mostly sees younger patients coming in for cardiac risk screening.", 600, ["Bengali", "English"], "204"),
-    ("Dr. Nasrin Akhter", "Cardiology", "MBBS, MD (Cardiology)", 8, "nasrin.akhter@moh-hospital.example",
+    ("Dr. Nasrin Akhter", "Cardiology", "MBBS, MD (Cardiology)", 8, "nasrin.akhter@sobh.com",
      "+880 1711-000119", ["Sat", "Mon", "Tue", "Wed", "Fri"], "09:00 - 16:00",
      "Treats a lot of hypertension, with a particular interest in heart disease in women.", 680, ["Bengali", "English"], "205"),
-    ("Dr. Zahid Hasan", "Cardiology", "MBBS, MS (Cardiac Surgery)", 20, "zahid.hasan@moh-hospital.example",
+    ("Dr. Zahid Hasan", "Cardiology", "MBBS, MS (Cardiac Surgery)", 20, "zahid.hasan@sobh.com",
      "+880 1711-000120", ["Sun", "Tue", "Wed", "Thu", "Sat"], "10:00 - 17:00",
      "The department's surgeon. Handles bypass and valve procedures, twenty years in the OR.", 1200, ["Bengali", "English", "Hindi"], "206"),
 
     # --- Paediatrics (Floor 3, rooms 301-306) ---
-    ("Dr. Nusrat Jahan", "Paediatrics", "MBBS, DCH", 11, "nusrat.jahan@moh-hospital.example",
+    ("Dr. Nusrat Jahan", "Paediatrics", "MBBS, DCH", 11, "nusrat.jahan@sobh.com",
      "+880 1711-000103", ["Sat", "Sun", "Mon", "Tue", "Wed"], "09:00 - 16:00",
      "Sees kids from birth through their teenage years, general paediatric care.", 700, ["Bengali", "English"], "301"),
-    ("Dr. Mahfuza Akter", "Paediatrics", "MBBS, MD (Paediatrics)", 9, "mahfuza.akter@moh-hospital.example",
+    ("Dr. Mahfuza Akter", "Paediatrics", "MBBS, MD (Paediatrics)", 9, "mahfuza.akter@sobh.com",
      "+880 1711-000111", ["Sat", "Mon", "Tue", "Wed", "Thu"], "10:00 - 17:00",
      "Runs most of the vaccination clinic and spends a lot of time talking to parents about nutrition.", 650, ["Bengali", "English"], "302"),
-    ("Dr. Rowshan Ara", "Paediatrics", "MBBS, DCH", 14, "rowshan.ara@moh-hospital.example",
+    ("Dr. Rowshan Ara", "Paediatrics", "MBBS, DCH", 14, "rowshan.ara@sobh.com",
      "+880 1711-000121", ["Sun", "Mon", "Wed", "Thu", "Fri"], "09:00 - 15:00",
      "A lot of her patients come in for asthma or allergies, plus routine growth monitoring.", 800, ["Bengali", "English"], "303"),
-    ("Dr. Faisal Islam", "Paediatrics", "MBBS, MD (Paediatrics)", 6, "faisal.islam@moh-hospital.example",
+    ("Dr. Faisal Islam", "Paediatrics", "MBBS, MD (Paediatrics)", 6, "faisal.islam@sobh.com",
      "+880 1711-000122", ["Sat", "Sun", "Tue", "Thu", "Fri"], "13:00 - 20:00",
      "Covers the newborn unit and handles paediatric emergencies when they come in.", 550, ["Bengali", "English"], "304"),
-    ("Dr. Tahmina Sultana", "Paediatrics", "MBBS, FCPS (Paediatrics)", 10, "tahmina.sultana@moh-hospital.example",
+    ("Dr. Tahmina Sultana", "Paediatrics", "MBBS, FCPS (Paediatrics)", 10, "tahmina.sultana@sobh.com",
      "+880 1711-000123", ["Sun", "Mon", "Tue", "Wed", "Sat"], "08:00 - 14:00",
      "Works mostly with developmental delays — speech, motor skills, that kind of thing.", 720, ["Bengali", "English"], "305"),
-    ("Dr. Habibur Rahman", "Paediatrics", "MBBS, DCH", 18, "habibur.rahman@moh-hospital.example",
+    ("Dr. Habibur Rahman", "Paediatrics", "MBBS, DCH", 18, "habibur.rahman@sobh.com",
      "+880 1711-000124", ["Mon", "Tue", "Wed", "Thu", "Sat"], "10:00 - 18:00",
      "The most senior paediatrician on staff. Mostly manages kids with long-term conditions.", 950, ["Bengali", "English", "Hindi"], "306"),
 
     # --- Orthopaedics (Floor 4, rooms 401-406) ---
-    ("Dr. Shafiqul Islam", "Orthopaedics", "MBBS, MS (Orthopaedics)", 17, "shafiqul.islam@moh-hospital.example",
+    ("Dr. Shafiqul Islam", "Orthopaedics", "MBBS, MS (Orthopaedics)", 17, "shafiqul.islam@sobh.com",
      "+880 1711-000104", ["Sun", "Mon", "Wed", "Thu", "Sat"], "09:00 - 17:00",
      "Does most of the joint replacements here, along with trauma surgery.", 1000, ["Bengali", "English"], "401"),
-    ("Dr. Rafiqul Alam", "Orthopaedics", "MBBS, D-Ortho", 11, "rafiqul.alam@moh-hospital.example",
+    ("Dr. Rafiqul Alam", "Orthopaedics", "MBBS, D-Ortho", 11, "rafiqul.alam@sobh.com",
      "+880 1711-000112", ["Sat", "Sun", "Tue", "Thu", "Fri"], "13:00 - 20:00",
      "Sees a lot of sports injuries and also takes spine consultations.", 750, ["Bengali", "English"], "402"),
-    ("Dr. Emran Hossain", "Orthopaedics", "MBBS, MS (Orthopaedics)", 9, "emran.hossain@moh-hospital.example",
+    ("Dr. Emran Hossain", "Orthopaedics", "MBBS, MS (Orthopaedics)", 9, "emran.hossain@sobh.com",
      "+880 1711-000125", ["Sun", "Mon", "Tue", "Wed", "Fri"], "09:00 - 16:00",
      "Mostly fracture care and arthroscopic procedures.", 700, ["Bengali", "English"], "403"),
-    ("Dr. Kohinoor Begum", "Orthopaedics", "MBBS, D-Ortho", 7, "kohinoor.begum@moh-hospital.example",
+    ("Dr. Kohinoor Begum", "Orthopaedics", "MBBS, D-Ortho", 7, "kohinoor.begum@sobh.com",
      "+880 1711-000126", ["Sat", "Mon", "Wed", "Thu", "Sat"], "10:00 - 17:00",
      "One of the few here who regularly takes paediatric orthopaedic cases.", 650, ["Bengali", "English"], "404"),
-    ("Dr. Aminul Islam", "Orthopaedics", "MBBS, MS (Orthopaedics)", 15, "aminul.islam@moh-hospital.example",
+    ("Dr. Aminul Islam", "Orthopaedics", "MBBS, MS (Orthopaedics)", 15, "aminul.islam@sobh.com",
      "+880 1711-000127", ["Sun", "Tue", "Wed", "Thu", "Sat"], "08:00 - 15:00",
      "Hip and knee replacements make up most of his caseload.", 900, ["Bengali", "English"], "405"),
-    ("Dr. Sazzad Karim", "Orthopaedics", "MBBS, D-Ortho", 4, "sazzad.karim@moh-hospital.example",
+    ("Dr. Sazzad Karim", "Orthopaedics", "MBBS, D-Ortho", 4, "sazzad.karim@sobh.com",
      "+880 1711-000128", ["Mon", "Tue", "Thu", "Fri", "Sat"], "14:00 - 21:00",
      "Newest on the team, mostly handles casting and general trauma walk-ins.", 500, ["Bengali", "English"], "406"),
 
     # --- Neuro Medicine (Floor 5, rooms 501-506) ---
-    ("Dr. Tanvir Ahmed", "Neuro Medicine", "MBBS, MD (Neurology)", 13, "tanvir.ahmed@moh-hospital.example",
+    ("Dr. Tanvir Ahmed", "Neuro Medicine", "MBBS, MD (Neurology)", 13, "tanvir.ahmed@sobh.com",
      "+880 1711-000105", ["Sun", "Mon", "Tue", "Thu", "Sat"], "10:00 - 17:00",
      "Covers stroke care, epilepsy, and movement disorders — a fairly broad general neurology practice.", 950, ["Bengali", "English"], "501"),
-    ("Dr. Salma Chowdhury", "Neuro Medicine", "MBBS, FCPS (Neurology)", 10, "salma.chowdhury@moh-hospital.example",
+    ("Dr. Salma Chowdhury", "Neuro Medicine", "MBBS, FCPS (Neurology)", 10, "salma.chowdhury@sobh.com",
      "+880 1711-000113", ["Sat", "Sun", "Wed", "Thu", "Fri"], "09:00 - 16:00",
      "A lot of her patients come in with chronic headaches or neuromuscular complaints.", 800, ["Bengali", "English"], "502"),
-    ("Dr. Delwar Hossain", "Neuro Medicine", "MBBS, MD (Neurology)", 12, "delwar.hossain@moh-hospital.example",
+    ("Dr. Delwar Hossain", "Neuro Medicine", "MBBS, MD (Neurology)", 12, "delwar.hossain@sobh.com",
      "+880 1711-000129", ["Sun", "Mon", "Tue", "Wed", "Fri"], "08:00 - 15:00",
      "Mostly follows multiple sclerosis and neuropathy patients long-term.", 850, ["Bengali", "English"], "503"),
-    ("Dr. Jesmin Akter", "Neuro Medicine", "MBBS, FCPS (Neuro Medicine)", 6, "jesmin.akter@moh-hospital.example",
+    ("Dr. Jesmin Akter", "Neuro Medicine", "MBBS, FCPS (Neuro Medicine)", 6, "jesmin.akter@sobh.com",
      "+880 1711-000130", ["Sat", "Mon", "Tue", "Thu", "Fri"], "13:00 - 20:00",
      "The department's paediatric neurology referral. Sees mostly children.", 600, ["Bengali", "English"], "504"),
-    ("Dr. Ashraf Uddin", "Neuro Medicine", "MBBS, MD (Neurology)", 19, "ashraf.uddin@moh-hospital.example",
+    ("Dr. Ashraf Uddin", "Neuro Medicine", "MBBS, MD (Neurology)", 19, "ashraf.uddin@sobh.com",
      "+880 1711-000131", ["Sun", "Tue", "Wed", "Thu", "Sat"], "09:00 - 16:00",
      "Most senior neurologist here. Runs the stroke rehabilitation clinic.", 1100, ["Bengali", "English", "Hindi"], "505"),
-    ("Dr. Ruma Khatun", "Neuro Medicine", "MBBS, D-Neuro", 8, "ruma.khatun@moh-hospital.example",
+    ("Dr. Ruma Khatun", "Neuro Medicine", "MBBS, D-Neuro", 8, "ruma.khatun@sobh.com",
      "+880 1711-000132", ["Sat", "Sun", "Mon", "Wed", "Thu"], "10:00 - 17:00",
      "Handles ongoing epilepsy monitoring for most of the department's patients.", 700, ["Bengali", "English"], "506"),
 
     # --- Dermatology (Floor 2, rooms 221-226) ---
-    ("Dr. Sabrina Haque", "Dermatology", "MBBS, DDV", 8, "sabrina.haque@moh-hospital.example",
+    ("Dr. Sabrina Haque", "Dermatology", "MBBS, DDV", 8, "sabrina.haque@sobh.com",
      "+880 1711-000106", ["Sat", "Sun", "Mon", "Wed", "Thu"], "11:00 - 18:00",
      "General dermatology — skin, hair, nails, patients of every age.", 650, ["Bengali", "English"], "221"),
-    ("Dr. Nazmul Haque", "Dermatology", "MBBS, MD (Dermatology)", 7, "nazmul.haque@moh-hospital.example",
+    ("Dr. Nazmul Haque", "Dermatology", "MBBS, MD (Dermatology)", 7, "nazmul.haque@sobh.com",
      "+880 1711-000114", ["Sun", "Mon", "Tue", "Thu", "Fri"], "09:00 - 15:00",
      "A mix of acne and eczema cases, plus some cosmetic dermatology work.", 600, ["Bengali", "English"], "222"),
-    ("Dr. Momtaz Begum", "Dermatology", "MBBS, DDV", 9, "momtaz.begum@moh-hospital.example",
+    ("Dr. Momtaz Begum", "Dermatology", "MBBS, DDV", 9, "momtaz.begum@sobh.com",
      "+880 1711-000133", ["Sat", "Tue", "Wed", "Thu", "Fri"], "10:00 - 17:00",
      "Mostly sees children — skin allergies and general paediatric dermatology.", 680, ["Bengali", "English"], "223"),
-    ("Dr. Rubel Miah", "Dermatology", "MBBS, MD (Dermatology)", 5, "rubel.miah@moh-hospital.example",
+    ("Dr. Rubel Miah", "Dermatology", "MBBS, MD (Dermatology)", 5, "rubel.miah@sobh.com",
      "+880 1711-000134", ["Sun", "Mon", "Wed", "Thu", "Sat"], "13:00 - 20:00",
      "Handles most of the laser treatment referrals and acne scarring cases.", 550, ["Bengali", "English"], "224"),
-    ("Dr. Shahnaz Parveen", "Dermatology", "MBBS, DDV", 13, "shahnaz.parveen@moh-hospital.example",
+    ("Dr. Shahnaz Parveen", "Dermatology", "MBBS, DDV", 13, "shahnaz.parveen@sobh.com",
      "+880 1711-000135", ["Sat", "Sun", "Mon", "Tue", "Thu"], "09:00 - 16:00",
      "Sees the harder autoimmune skin cases that other doctors refer over.", 800, ["Bengali", "English"], "225"),
-    ("Dr. Golam Sarwar", "Dermatology", "MBBS, MD (Dermatology)", 17, "golam.sarwar@moh-hospital.example",
+    ("Dr. Golam Sarwar", "Dermatology", "MBBS, MD (Dermatology)", 17, "golam.sarwar@sobh.com",
      "+880 1711-000136", ["Mon", "Tue", "Wed", "Fri", "Sat"], "10:00 - 18:00",
      "Longest-serving dermatologist here. Mostly follows chronic skin disease patients.", 900, ["Bengali", "English"], "226"),
 
     # --- ENT (Floor 3, rooms 321-326) ---
-    ("Dr. Imran Hossain", "ENT", "MBBS, MS (ENT)", 10, "imran.hossain@moh-hospital.example",
+    ("Dr. Imran Hossain", "ENT", "MBBS, MS (ENT)", 10, "imran.hossain@sobh.com",
      "+880 1711-000107", ["Sun", "Mon", "Tue", "Wed", "Sat"], "09:00 - 16:00",
      "ENT surgeon — mostly sinus surgery these days.", 750, ["Bengali", "English"], "321"),
-    ("Dr. Shirin Akhter", "ENT", "MBBS, D-ENT", 13, "shirin.akhter@moh-hospital.example",
+    ("Dr. Shirin Akhter", "ENT", "MBBS, D-ENT", 13, "shirin.akhter@sobh.com",
      "+880 1711-000115", ["Mon", "Tue", "Wed", "Thu", "Fri"], "10:00 - 18:00",
      "About half her patients are kids: hearing disorders and general paediatric ENT.", 800, ["Bengali", "English"], "322"),
-    ("Dr. Laila Yesmin", "ENT", "MBBS, D-ENT", 10, "laila.yesmin@moh-hospital.example",
+    ("Dr. Laila Yesmin", "ENT", "MBBS, D-ENT", 10, "laila.yesmin@sobh.com",
      "+880 1711-000137", ["Sat", "Sun", "Tue", "Wed", "Thu"], "09:00 - 15:00",
      "Voice and throat disorders. Sees a lot of teachers and singers.", 700, ["Bengali", "English"], "323"),
-    ("Dr. Anisur Rahman", "ENT", "MBBS, MS (ENT)", 6, "anisur.rahman@moh-hospital.example",
+    ("Dr. Anisur Rahman", "ENT", "MBBS, MS (ENT)", 6, "anisur.rahman@sobh.com",
      "+880 1711-000138", ["Sun", "Mon", "Wed", "Fri", "Sat"], "14:00 - 21:00",
      "Fairly new to the department. Mostly sinus surgery and allergy management.", 600, ["Bengali", "English"], "324"),
-    ("Dr. Parveen Sultana", "ENT", "MBBS, D-ENT", 14, "parveen.sultana@moh-hospital.example",
+    ("Dr. Parveen Sultana", "ENT", "MBBS, D-ENT", 14, "parveen.sultana@sobh.com",
      "+880 1711-000139", ["Sat", "Mon", "Tue", "Thu", "Fri"], "09:00 - 16:00",
      "Runs the paediatric hearing screening clinic.", 820, ["Bengali", "English"], "325"),
-    ("Dr. Tariqul Islam", "ENT", "MBBS, MS (ENT)", 8, "tariqul.islam@moh-hospital.example",
+    ("Dr. Tariqul Islam", "ENT", "MBBS, MS (ENT)", 8, "tariqul.islam@sobh.com",
      "+880 1711-000140", ["Sun", "Tue", "Wed", "Thu", "Sat"], "10:00 - 17:00",
      "Sees mostly sleep apnea and snoring referrals.", 680, ["Bengali", "English"], "326"),
 
     # --- Obs & Gynae (Floor 6, rooms 601-606) ---
-    ("Dr. Farzana Rahman", "Obs & Gynae", "MBBS, FCPS (Gynae & Obs)", 15, "farzana.rahman@moh-hospital.example",
+    ("Dr. Farzana Rahman", "Obs & Gynae", "MBBS, FCPS (Gynae & Obs)", 15, "farzana.rahman@sobh.com",
      "+880 1711-000108", ["Sat", "Sun", "Tue", "Wed", "Thu"], "09:00 - 17:00",
      "Handles the high-risk pregnancies and most of the gynaecological surgery.", 950, ["Bengali", "English"], "601"),
-    ("Dr. Ismat Jahan", "Obs & Gynae", "MBBS, MS (Gynae & Obs)", 12, "ismat.jahan@moh-hospital.example",
+    ("Dr. Ismat Jahan", "Obs & Gynae", "MBBS, MS (Gynae & Obs)", 12, "ismat.jahan@sobh.com",
      "+880 1711-000116", ["Sun", "Mon", "Wed", "Thu", "Fri"], "14:00 - 21:00",
      "Fertility care is her main focus, along with minimally invasive surgery.", 850, ["Bengali", "English"], "602"),
-    ("Dr. Nazma Begum", "Obs & Gynae", "MBBS, FCPS (Gynae & Obs)", 16, "nazma.begum@moh-hospital.example",
+    ("Dr. Nazma Begum", "Obs & Gynae", "MBBS, FCPS (Gynae & Obs)", 16, "nazma.begum@sobh.com",
      "+880 1711-000141", ["Sat", "Sun", "Mon", "Tue", "Thu"], "09:00 - 16:00",
      "Senior consultant. Gets called in for the complicated deliveries.", 1000, ["Bengali", "English"], "603"),
-    ("Dr. Ruksana Akhter", "Obs & Gynae", "MBBS, MS (Gynae & Obs)", 9, "ruksana.akhter@moh-hospital.example",
+    ("Dr. Ruksana Akhter", "Obs & Gynae", "MBBS, MS (Gynae & Obs)", 9, "ruksana.akhter@sobh.com",
      "+880 1711-000142", ["Sun", "Mon", "Tue", "Wed", "Fri"], "10:00 - 17:00",
      "Mostly routine antenatal and postnatal checkups.", 700, ["Bengali", "English"], "604"),
-    ("Dr. Farida Yasmin", "Obs & Gynae", "MBBS, FCPS (Gynae & Obs)", 12, "farida.yasmin@moh-hospital.example",
+    ("Dr. Farida Yasmin", "Obs & Gynae", "MBBS, FCPS (Gynae & Obs)", 12, "farida.yasmin@sobh.com",
      "+880 1711-000143", ["Sat", "Tue", "Wed", "Thu", "Fri"], "13:00 - 20:00",
      "Sees a lot of menopause and general reproductive health cases.", 780, ["Bengali", "English"], "605"),
-    ("Dr. Shamima Nasrin", "Obs & Gynae", "MBBS, DGO", 7, "shamima.nasrin@moh-hospital.example",
+    ("Dr. Shamima Nasrin", "Obs & Gynae", "MBBS, DGO", 7, "shamima.nasrin@sobh.com",
      "+880 1711-000144", ["Sun", "Mon", "Thu", "Fri", "Sat"], "09:00 - 15:00",
      "Adolescent gynaecology and family planning make up most of her clinic.", 650, ["Bengali", "English"], "606"),
 
     # --- Medicine (Floor 1, rooms 101-106) ---
-    ("Dr. Kamrul Hasan", "Medicine", "MBBS, MD (Internal Medicine)", 12, "kamrul.hasan@moh-hospital.example",
+    ("Dr. Kamrul Hasan", "Medicine", "MBBS, MD (Internal Medicine)", 12, "kamrul.hasan@sobh.com",
      "+880 1711-000109", ["Sun", "Mon", "Tue", "Wed", "Thu"], "08:00 - 15:00",
      "General physician. A lot of chronic disease follow-ups and routine checkups.", 500, ["Bengali", "English"], "101"),
-    ("Dr. Ayesha Siddika", "Medicine", "MBBS, FCPS (Medicine)", 6, "ayesha.siddika@moh-hospital.example",
+    ("Dr. Ayesha Siddika", "Medicine", "MBBS, FCPS (Medicine)", 6, "ayesha.siddika@sobh.com",
      "+880 1711-000110", ["Sat", "Mon", "Tue", "Thu", "Sat"], "13:00 - 20:00",
      "Diabetes management is her main focus, along with general adult care.", 450, ["Bengali", "English"], "102"),
-    ("Dr. Mahbub Alam", "Medicine", "MBBS, MD (Medicine)", 11, "mahbub.alam@moh-hospital.example",
+    ("Dr. Mahbub Alam", "Medicine", "MBBS, MD (Medicine)", 11, "mahbub.alam@sobh.com",
      "+880 1711-000145", ["Sun", "Mon", "Wed", "Thu", "Sat"], "09:00 - 16:00",
      "Sees mostly hypertension and thyroid patients.", 550, ["Bengali", "English"], "103"),
-    ("Dr. Nasima Khatun", "Medicine", "MBBS, FCPS (Medicine)", 5, "nasima.khatun@moh-hospital.example",
+    ("Dr. Nasima Khatun", "Medicine", "MBBS, FCPS (Medicine)", 5, "nasima.khatun@sobh.com",
      "+880 1711-000146", ["Sat", "Sun", "Tue", "Wed", "Fri"], "10:00 - 17:00",
      "A lot of her patients come in for anaemia or general women's health concerns.", 480, ["Bengali", "English"], "104"),
-    ("Dr. Shamsul Alam", "Medicine", "MBBS, MD (Internal Medicine)", 20, "shamsul.alam@moh-hospital.example",
+    ("Dr. Shamsul Alam", "Medicine", "MBBS, MD (Internal Medicine)", 20, "shamsul.alam@sobh.com",
      "+880 1711-000147", ["Sun", "Mon", "Tue", "Thu", "Fri"], "08:00 - 14:00",
      "Most senior physician in the department. Usually gets the complicated multi-condition cases.", 750, ["Bengali", "English", "Hindi"], "105"),
-    ("Dr. Ruma Aktar", "Medicine", "MBBS, MD (Medicine)", 8, "ruma.aktar@moh-hospital.example",
+    ("Dr. Ruma Aktar", "Medicine", "MBBS, MD (Medicine)", 8, "ruma.aktar@sobh.com",
      "+880 1711-000148", ["Sat", "Mon", "Wed", "Thu", "Fri"], "14:00 - 21:00",
      "Runs the fever clinic, mostly infectious disease cases.", 520, ["Bengali", "English"], "106"),
-    ("Dr. Golam Rabbani", "Medicine", "MBBS, MD (Medicine)", 14, "golam.rabbani@moh-hospital.example",
+    ("Dr. Golam Rabbani", "Medicine", "MBBS, MD (Medicine)", 14, "golam.rabbani@sobh.com",
      "+880 1711-000149", ["Sun", "Mon", "Tue", "Wed", "Fri"], "09:00 - 16:00",
      "General physician, mostly long-term adult chronic care.", 600, ["Bengali", "English"], "107"),
-    ("Dr. Rehana Begum", "Medicine", "MBBS, FCPS (Medicine)", 7, "rehana.begum@moh-hospital.example",
+    ("Dr. Rehana Begum", "Medicine", "MBBS, FCPS (Medicine)", 7, "rehana.begum@sobh.com",
      "+880 1711-000150", ["Sat", "Sun", "Tue", "Thu", "Fri"], "13:00 - 20:00",
      "Metabolic disorders and general women's health, fairly steady caseload.", 500, ["Bengali", "English"], "108"),
 
     # --- A few departments run a larger roster than others, same as a real hospital ---
-    ("Dr. Anowara Islam", "Paediatrics", "MBBS, DCH", 5, "anowara.islam@moh-hospital.example",
+    ("Dr. Anowara Islam", "Paediatrics", "MBBS, DCH", 5, "anowara.islam@sobh.com",
      "+880 1711-000151", ["Sun", "Mon", "Wed", "Thu", "Fri"], "10:00 - 17:00",
      "New to the team. Sees a lot of infant feeding issues and early development checkups.", 500, ["Bengali", "English"], "307"),
-    ("Dr. Kamal Chowdhury", "Paediatrics", "MBBS, MD (Paediatrics)", 13, "kamal.chowdhury@moh-hospital.example",
+    ("Dr. Kamal Chowdhury", "Paediatrics", "MBBS, MD (Paediatrics)", 13, "kamal.chowdhury@sobh.com",
      "+880 1711-000152", ["Sat", "Sun", "Mon", "Wed", "Sat"], "09:00 - 15:00",
      "Handles the tougher respiratory cases — recurring pneumonia, chronic cough, that sort of thing.", 780, ["Bengali", "English"], "308"),
-    ("Dr. Sultana Yasmin", "Paediatrics", "MBBS, FCPS (Paediatrics)", 8, "sultana.yasmin@moh-hospital.example",
+    ("Dr. Sultana Yasmin", "Paediatrics", "MBBS, FCPS (Paediatrics)", 8, "sultana.yasmin@sobh.com",
      "+880 1711-000153", ["Sun", "Tue", "Wed", "Thu", "Sat"], "14:00 - 20:00",
      "Mostly sees school-age kids and teenagers for routine checkups.", 650, ["Bengali", "English"], "309"),
-    ("Dr. Belal Rahman", "Orthopaedics", "MBBS, D-Ortho", 10, "belal.rahman@moh-hospital.example",
+    ("Dr. Belal Rahman", "Orthopaedics", "MBBS, D-Ortho", 10, "belal.rahman@sobh.com",
      "+880 1711-000154", ["Sat", "Mon", "Tue", "Thu", "Fri"], "09:00 - 16:00",
      "Runs the arthroscopy list here, mostly knees and shoulders.", 750, ["Bengali", "English"], "407"),
-    ("Dr. Farida Chowdhury", "Dermatology", "MBBS, DDV", 6, "farida.chowdhury@moh-hospital.example",
+    ("Dr. Farida Chowdhury", "Dermatology", "MBBS, DDV", 6, "farida.chowdhury@sobh.com",
      "+880 1711-000155", ["Sun", "Mon", "Wed", "Fri", "Sat"], "10:00 - 17:00",
      "Hair loss and scalp conditions make up most of her clinic.", 600, ["Bengali", "English"], "227"),
-    ("Dr. Iqbal Kabir", "Dermatology", "MBBS, MD (Dermatology)", 11, "iqbal.kabir@moh-hospital.example",
+    ("Dr. Iqbal Kabir", "Dermatology", "MBBS, MD (Dermatology)", 11, "iqbal.kabir@sobh.com",
      "+880 1711-000156", ["Sat", "Sun", "Tue", "Wed", "Thu"], "09:00 - 15:00",
      "Runs the psoriasis clinic and manages a lot of eczema cases too.", 750, ["Bengali", "English"], "228"),
-    ("Dr. Sabina Yasmin", "Dermatology", "MBBS, DDV", 4, "sabina.yasmin@moh-hospital.example",
+    ("Dr. Sabina Yasmin", "Dermatology", "MBBS, DDV", 4, "sabina.yasmin@sobh.com",
      "+880 1711-000157", ["Sun", "Mon", "Tue", "Thu", "Fri"], "13:00 - 19:00",
      "Newest addition to dermatology. Mostly sees teenagers for acne and general skin care.", 480, ["Bengali", "English"], "229"),
-    ("Dr. Rezwanul Haque", "Dermatology", "MBBS, MD (Dermatology)", 15, "rezwanul.haque@moh-hospital.example",
+    ("Dr. Rezwanul Haque", "Dermatology", "MBBS, MD (Dermatology)", 15, "rezwanul.haque@sobh.com",
      "+880 1711-000158", ["Sat", "Mon", "Wed", "Thu", "Sat"], "10:00 - 18:00",
      "Senior dermatologist. Does most of the skin cancer screenings here.", 850, ["Bengali", "English", "Hindi"], "230"),
-    ("Dr. Firoz Alam", "ENT", "MBBS, MS (ENT)", 9, "firoz.alam@moh-hospital.example",
+    ("Dr. Firoz Alam", "ENT", "MBBS, MS (ENT)", 9, "firoz.alam@sobh.com",
      "+880 1711-000159", ["Sun", "Mon", "Tue", "Wed", "Thu"], "09:00 - 16:00",
      "Does most of the tonsil and adenoid surgeries here.", 700, ["Bengali", "English"], "327"),
-    ("Dr. Nasreen Akhter", "ENT", "MBBS, D-ENT", 12, "nasreen.akhter@moh-hospital.example",
+    ("Dr. Nasreen Akhter", "ENT", "MBBS, D-ENT", 12, "nasreen.akhter@sobh.com",
      "+880 1711-000160", ["Sat", "Sun", "Wed", "Thu", "Fri"], "14:00 - 21:00",
      "Balance disorders and vertigo cases mostly land with her.", 780, ["Bengali", "English"], "328"),
 ]
 
 PATIENTS = [
     {
-        "name": "Abdullah Al Mamun", "phone": "+880 1611-100201", "email": "abdullah.mamun@example.com",
+        "name": "Abdullah Al Mamun", "phone": "+880 1611-100201", "email": "abdullah.mamun@sobh.com",
         "dob": "1990-04-12", "gender": "Male", "blood_group": "B+", "address": "Mirpur-10, Dhaka",
         "avatar_initials": "AM",
         "medical_history": [
@@ -269,7 +284,7 @@ PATIENTS = [
         ],
     },
     {
-        "name": "Nasrin Sultana", "phone": "+880 1611-100202", "email": "nasrin.sultana@example.com",
+        "name": "Nasrin Sultana", "phone": "+880 1611-100202", "email": "nasrin.sultana@sobh.com",
         "dob": "1985-11-02", "gender": "Female", "blood_group": "O+", "address": "Dhanmondi, Dhaka",
         "avatar_initials": "NS",
         "medical_history": [
@@ -280,7 +295,7 @@ PATIENTS = [
         "reports": [{"name": "Ultrasound Report", "date": "2026-06-20", "type": "PDF"}],
     },
     {
-        "name": "Rakibul Islam", "phone": "+880 1611-100203", "email": "rakibul.islam@example.com",
+        "name": "Rakibul Islam", "phone": "+880 1611-100203", "email": "rakibul.islam@sobh.com",
         "dob": "2001-07-23", "gender": "Male", "blood_group": "A+", "address": "Uttara, Dhaka",
         "avatar_initials": "RI",
         "medical_history": [
@@ -291,7 +306,7 @@ PATIENTS = [
         "reports": [{"name": "X-Ray - Left Ankle", "date": "2026-07-01", "type": "Image"}],
     },
     {
-        "name": "Tania Ferdous", "phone": "+880 1611-100204", "email": "tania.ferdous@example.com",
+        "name": "Tania Ferdous", "phone": "+880 1611-100204", "email": "tania.ferdous@sobh.com",
         "dob": "1995-01-30", "gender": "Female", "blood_group": "AB+", "address": "Banani, Dhaka",
         "avatar_initials": "TF",
         "medical_history": [],
@@ -372,7 +387,7 @@ def _generate_extra_patients():
         patients.append({
             "name": name,
             "phone": f"+880 1611-{100205 + i}",
-            "email": name.lower().replace(".", "").replace(" ", ".") + "@example.com",
+            "email": name.lower().replace(".", "").replace(" ", ".") + "@sobh.com",
             "dob": f"{birth_year}-{birth_month:02d}-{birth_day:02d}",
             "gender": gender,
             "blood_group": _BLOOD_GROUPS[i % len(_BLOOD_GROUPS)],
@@ -395,7 +410,7 @@ for _i, _p in enumerate(PATIENTS[:4]):
 # side by side without hunting through the 40-row patient list.
 DEMO_PATIENTS = [
     {
-        "name": "Imran Chowdhury", "phone": "+880 1611-100301", "email": "imran.chowdhury@example.com",
+        "name": "Imran Chowdhury", "phone": "+880 1611-100301", "email": "imran.chowdhury@sobh.com",
         "dob": "1988-09-17", "gender": "Male", "blood_group": "A+", "address": "Banani, Dhaka",
         "avatar_initials": "IC", "mrn": "MRN 56010",
         "medical_history": [
@@ -415,7 +430,7 @@ DEMO_PATIENTS = [
         ],
     },
     {
-        "name": "Sadia Rahman", "phone": "+880 1611-100302", "email": "sadia.rahman@example.com",
+        "name": "Sadia Rahman", "phone": "+880 1611-100302", "email": "sadia.rahman@sobh.com",
         "dob": "1996-02-08", "gender": "Female", "blood_group": "B+", "address": "Uttara, Dhaka",
         "avatar_initials": "SR", "mrn": "MRN 56011",
         "medical_history": [
@@ -431,7 +446,7 @@ DEMO_PATIENTS = [
         ],
     },
     {
-        "name": "Anwar Hossain Khan", "phone": "+880 1611-100303", "email": "anwar.khan@example.com",
+        "name": "Anwar Hossain Khan", "phone": "+880 1611-100303", "email": "anwar.khan@sobh.com",
         "dob": "1959-05-30", "gender": "Male", "blood_group": "O+", "address": "Mohammadpur, Dhaka",
         "avatar_initials": "AK", "mrn": "MRN 56012",
         "medical_history": [
@@ -458,13 +473,13 @@ PATIENTS += DEMO_PATIENTS
 
 # Three more consultants, one each in the busiest departments.
 DOCTORS += [
-    ("Dr. Sabbir Ahmed", "Medicine", "MBBS, MD (Internal Medicine)", 10, "sabbir.ahmed@moh-hospital.example",
+    ("Dr. Sabbir Ahmed", "Medicine", "MBBS, MD (Internal Medicine)", 10, "sabbir.ahmed@sobh.com",
      "+880 1711-000161", ["Sun", "Mon", "Tue", "Wed", "Thu"], "09:00 - 16:00",
      "Splits his week between the general clinic and the diabetes follow-up list.", 580, ["Bengali", "English"], "109"),
-    ("Dr. Ruhul Amin", "Cardiology", "MBBS, MD (Cardiology)", 12, "ruhul.amin@moh-hospital.example",
+    ("Dr. Ruhul Amin", "Cardiology", "MBBS, MD (Cardiology)", 12, "ruhul.amin@sobh.com",
      "+880 1711-000162", ["Sat", "Sun", "Tue", "Thu", "Fri"], "10:00 - 18:00",
      "Took over the hypertension clinic last year. Sees a lot of first-time referrals.", 780, ["Bengali", "English"], "207"),
-    ("Dr. Sharmin Akter", "Obs & Gynae", "MBBS, FCPS (Gynae & Obs)", 8, "sharmin.akter@moh-hospital.example",
+    ("Dr. Sharmin Akter", "Obs & Gynae", "MBBS, FCPS (Gynae & Obs)", 8, "sharmin.akter@sobh.com",
      "+880 1711-000163", ["Sun", "Mon", "Wed", "Thu", "Sat"], "09:00 - 15:00",
      "Mostly antenatal clinics, with a half-day of general gynae consults on Thursdays.", 720, ["Bengali", "English"], "607"),
 ]
@@ -504,7 +519,7 @@ def _generate_extra_admins():
         role = "Super Admin" if i % 12 == 0 else "Admin"
         admins.append({
             "name": name,
-            "email": name.lower().replace(".", "").replace(" ", ".") + "@moh-hospital.example",
+            "email": name.lower().replace(".", "").replace(" ", ".") + "@sobh.com",
             "role": role,
             "avatar_initials": initials,
             "phone": f"+880 1811-{100000 + i * 3}",
@@ -515,13 +530,13 @@ def _generate_extra_admins():
 
 
 DEMO_ADMINS = [
-    {"name": "Tanvir Alam", "email": "tanvir.alam@moh-hospital.example", "role": "Super Admin",
+    {"name": "Tanvir Alam", "email": "tanvir.alam@sobh.com", "role": "Super Admin",
      "avatar_initials": "TA", "phone": "+880 1811-200001", "department": "Operations",
      "join_date": "2019-06-01"},
-    {"name": "Mehnaz Karim", "email": "mehnaz.karim@moh-hospital.example", "role": "Admin",
+    {"name": "Mehnaz Karim", "email": "mehnaz.karim@sobh.com", "role": "Admin",
      "avatar_initials": "MK", "phone": "+880 1811-200002", "department": "Patient Records",
      "join_date": "2022-02-15"},
-    {"name": "Sohel Rana", "email": "sohel.rana@moh-hospital.example", "role": "Admin",
+    {"name": "Sohel Rana", "email": "sohel.rana@sobh.com", "role": "Admin",
      "avatar_initials": "SR", "phone": "+880 1811-200003", "department": "Front Desk",
      "join_date": "2023-09-04"},
 ]
@@ -732,7 +747,7 @@ async def main():
     print("Inserting admin accounts...")
     admin_docs = [{
         "name": "Md. Habibur Rahman",
-        "email": "admin@moh-hospital.example",
+        "email": "admin@sobh.com",
         "password_hash": hash_password(ADMIN_DEMO_PASSWORD),
         "role": "Super Admin",
         "avatar_initials": "HR",
@@ -885,22 +900,41 @@ async def main():
     await tokens_col.insert_many(sample_tokens)
 
     print("Inserting starter notifications...")
+    # Look up the numbers actually assigned above rather than hardcoding them,
+    # so these messages never cite a token that doesn't exist.
+    in_room = next(
+        t for t in sample_tokens
+        if t["doctor_id"] == farhana_id and t["status"] == "in-consultation"
+    )
+    emergency = next(
+        t for t in sample_tokens
+        if t["doctor_id"] == farhana_id and t["type"] == "emergency"
+    )
     await notifications_col.insert_many([
         {"role": "patient", "profile_id": patient_ids["Abdullah Al Mamun"], "title": "Token confirmed",
-         "body": "Your token A-014 with Dr. Farhana Kabir is confirmed for today.",
+         "body": f"Your token {in_room['token_number']} with Dr. Farhana Kabir is confirmed for today.",
          "time": f"{TODAY}T08:10:00", "read": False},
         {"role": "doctor", "profile_id": farhana_id, "title": "Emergency token added",
-         "body": "An emergency token (A-015) was added to your queue.",
+         "body": f"An emergency token ({emergency['token_number']}) was added to your queue.",
          "time": f"{TODAY}T09:05:00", "read": False},
     ])
+
+    # Short aliases for demoing. Typing farhana.kabir@sobh.com into a login form
+    # in front of an audience is painful, so a few accounts can also be reached
+    # as doctor1@sobh.com and so on. Their real email still works too.
+    print("Adding short demo login aliases...")
+    for collection, name, alias in DEMO_ALIASES:
+        target = {"doctors": doctors_col, "patients": patients_col, "admins": admins_col}[collection]
+        await target.update_one({"name": name}, {"$set": {"login_alias": alias}})
 
     print(f"Done. {len(doctor_ids)} doctors, {len(patient_ids)} patients, "
           f"{len(SPECIALTIES)} specialties, {len(PACKAGES)} packages, {len(admin_docs)} admins, "
           f"{len(sample_tokens)} sample tokens loaded.")
-    print(f"\nDemo logins (any account below works — every account in a role shares the same password):")
-    print(f"  Patient -> abdullah.mamun@example.com / {PATIENT_DEMO_PASSWORD}")
-    print(f"  Doctor  -> farhana.kabir@moh-hospital.example / {DOCTOR_DEMO_PASSWORD}")
-    print(f"  Admin   -> admin@moh-hospital.example / {ADMIN_DEMO_PASSWORD}")
+    print("\nDemo logins — every account in a role shares one password.")
+    print(f"  Patient  {PATIENT_DEMO_PASSWORD:<12} patient1@sobh.com .. patient3@sobh.com")
+    print(f"  Doctor   {DOCTOR_DEMO_PASSWORD:<12} doctor1@sobh.com .. doctor3@sobh.com")
+    print(f"  Admin    {ADMIN_DEMO_PASSWORD:<12} admin1@sobh.com .. admin3@sobh.com")
+    print("  (or any of the 149 name-based addresses, e.g. farhana.kabir@sobh.com)")
 
 
 if __name__ == "__main__":

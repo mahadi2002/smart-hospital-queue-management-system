@@ -13,6 +13,7 @@ import Card from '../../components/ui/Card'
 import { useQueue } from '../../context/QueueContext'
 import { useDirectory } from '../../context/DirectoryContext'
 import { TOKEN_STATUS } from '../../constants/tokenStatus'
+import { todayLocal } from '../../utils/format'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip)
 
@@ -31,7 +32,7 @@ export default function AdminDashboard() {
   const { tokens } = useQueue()
   const { doctors, specialties, getSpecialtyById } = useDirectory()
 
-  const todayPrefix = new Date().toISOString().slice(0, 10)
+  const todayPrefix = todayLocal()
   const todayTokens = useMemo(
     () => tokens.filter((t) => (t.bookedAt || '').startsWith(todayPrefix)),
     [tokens, todayPrefix],

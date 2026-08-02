@@ -9,7 +9,7 @@ import { normalizePatient } from '../../services/normalize'
 import { useAuth } from '../../context/AuthContext'
 import { useQueue } from '../../context/QueueContext'
 import { useDirectory } from '../../context/DirectoryContext'
-import { getInitials } from '../../utils/format'
+import { getInitials, todayLocal } from '../../utils/format'
 import { TOKEN_STATUS, TOKEN_TYPE } from '../../constants/tokenStatus'
 import { showConfirm, showToast } from '../../utils/toast'
 
@@ -46,7 +46,7 @@ export default function DoctorLiveQueue() {
 
   // getQueueForDoctor only returns the live queue, so count finished
   // consultations off the doctor's full token list instead.
-  const todayPrefix = new Date().toISOString().slice(0, 10)
+  const todayPrefix = todayLocal()
   const seenToday = getTokensForDoctor(doctorId).filter(
     (t) => t.status === TOKEN_STATUS.COMPLETED && (t.bookedAt || '').startsWith(todayPrefix),
   ).length

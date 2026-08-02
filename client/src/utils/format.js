@@ -28,3 +28,14 @@ export function formatDateTime(dateString) {
     minute: '2-digit',
   })
 }
+
+// Today's date as YYYY-MM-DD in the *local* timezone, for matching against the
+// date part of a stored timestamp.
+//
+// Don't use toISOString() for this — it converts to UTC first. We're at UTC+6,
+// so between midnight and 6am it returns yesterday's date, and anything
+// counting "today" silently reads zero for the first six hours of every day.
+// 'en-CA' is the trick: it formats as YYYY-MM-DD, but in local time.
+export function todayLocal() {
+  return new Date().toLocaleDateString('en-CA')
+}

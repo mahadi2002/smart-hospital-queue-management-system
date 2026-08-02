@@ -124,15 +124,15 @@ python -m venv .venv
 
 pip install -r requirements.txt
 copy .env.example .env            # macOS / Linux: cp .env.example .env
-python seed.py                    # loads the starting data
+python -m scripts.seed            # loads the starting data
 python -m uvicorn app.main:app --reload --port 8000
 ```
 
 The API is now on `http://localhost:8000`, with interactive docs at
 `http://localhost:8000/docs`.
 
-> `seed.py` **wipes and reloads** the collections every time it runs. Run it once at
-> setup; don't run it against data you want to keep.
+> The seed script **wipes and reloads** the collections every time it runs. Run it
+> once at setup; don't run it against data you want to keep.
 
 ### 3. Front end
 
@@ -157,18 +157,36 @@ npm run preview
 
 ## Demo logins
 
-`seed.py` loads **63 doctors, 43 patients and 43 admins**. Every account in a role
-shares the same password, so any of the seeded emails will work.
+The seed script loads **63 doctors, 43 patients and 43 admins**, all on the
+`@sobh.com` domain. Every account in a role shares one password.
 
-| Role | Password | Example accounts |
+### Quick logins
+
+Short aliases, meant for demoing — no long names to type.
+
+| Role | Emails | Password |
 |---|---|---|
-| Patient | `password123` | `abdullah.mamun@example.com`, `nasrin.sultana@example.com` |
-| Doctor | `doctor123` | `farhana.kabir@moh-hospital.example`, `kamrul.hasan@moh-hospital.example` |
-| Admin | `admin123` | `admin@moh-hospital.example` (Super Admin) |
+| Patient | `patient1@sobh.com`, `patient2@sobh.com`, `patient3@sobh.com` | `password123` |
+| Doctor | `doctor1@sobh.com`, `doctor2@sobh.com`, `doctor3@sobh.com` | `doctor123` |
+| Admin | `admin1@sobh.com`, `admin2@sobh.com`, `admin3@sobh.com` | `admin123` |
 
-For the best first impression, log in as **Dr. Farhana Kabir** — her queue is seeded
-with a patient mid-consultation, an emergency case, a walk-in, and an advance
-booking.
+### Full accounts
+
+Every one of the 149 accounts also logs in with its own name-based address:
+
+| Role | Examples | Password |
+|---|---|---|
+| Patient | `abdullah.mamun@sobh.com`, `nasrin.sultana@sobh.com`, `rakibul.islam@sobh.com` | `password123` |
+| Doctor | `farhana.kabir@sobh.com`, `nusrat.jahan@sobh.com`, `kamrul.hasan@sobh.com` | `doctor123` |
+| Admin | `admin@sobh.com` (Super Admin), `md.nurul.islam@sobh.com`, `shahida.akter@sobh.com` | `admin123` |
+
+The aliases are the same accounts, not extra ones — `doctor1@sobh.com` and
+`farhana.kabir@sobh.com` both sign in as Dr. Farhana Kabir. See the full list in
+**Admin → Doctors / Patients / Admins**.
+
+For the best first impression, log in as **`doctor1@sobh.com`** (Dr. Farhana
+Kabir) — her queue is seeded with a patient mid-consultation, an emergency case, a
+walk-in, and an advance booking.
 
 New patients can register themselves. Doctor and admin accounts are created by an
 admin, matching how a real hospital would issue them.
@@ -352,7 +370,8 @@ server/
     models/        Pydantic request/response schemas
     routers/       auth, doctors, patients, admins, specialties,
                    tokens, notifications, packages, config
-  seed.py          Loads the starting dataset
+  scripts/
+    seed.py        Loads the starting dataset (python -m scripts.seed)
   requirements.txt
 ```
 
@@ -383,7 +402,7 @@ to write unnatural code.
 even though `patient_id` could look it up. Guests book without an account and have no
 id at all, so the name has to live on the token regardless.
 
-**Deterministic seed data.** `seed.py` uses a fixed random seed, so the same dataset
+**Deterministic seed data.** The seed script uses a fixed random seed, so the same dataset
 is produced every time. Demos are reproducible, and queue depths still vary per
 doctor and per department rather than looking machine-generated.
 

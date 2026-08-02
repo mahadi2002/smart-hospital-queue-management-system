@@ -17,6 +17,13 @@ COLLECTION_BY_ROLE = {"patient": patients_col, "doctor": doctors_col, "admin": a
 ARCHIVED_STATUS = "archived"
 
 
+def _by_login(email: str) -> dict:
+    """Match an account by its real email or by a short demo alias. A handful of
+    seeded accounts carry a `login_alias` like doctor1@sobh.com purely so a live
+    demo doesn't involve typing out somebody's full name."""
+    return {"$or": [{"email": email}, {"login_alias": email}]}
+
+
 def _profile_without_password(doc: dict) -> dict:
     doc = serialize_doc(doc)
     doc.pop("password_hash", None)
@@ -50,7 +57,7 @@ async def register_patient(payload: PatientRegister):
 
 @router.post("/login/patient")
 async def login_patient(payload: PatientLogin):
-    patient = await patients_col.find_one({"email": payload.email})
+    patient = await patients_col.find_one(_by_login(payload.email))
     if not patient or not verify_password(payload.password, patient["password_hash"]):
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Invalid email or password.")
 
@@ -60,7 +67,7 @@ async def login_patient(payload: PatientLogin):
 
 @router.post("/login/doctor")
 async def login_doctor(payload: DoctorLogin):
-    doctor = await doctors_col.find_one({"email": payload.email})
+    doctor = await doctors_col.find_one(_by_login(payload.email))
     # A removed doctor keeps their record so old bookings still show who the
     # patient saw, but the password hash is gone — there's nothing left to
     # log in with, and the status check makes that explicit.
@@ -78,7 +85,7 @@ async def login_doctor(payload: DoctorLogin):
 
 @router.post("/login/admin")
 async def login_admin(payload: AdminLogin):
-    admin = await admins_col.find_one({"email": payload.email})
+    admin = await admins_col.find_one(_by_login(payload.email))
     if not admin or not verify_password(payload.password, admin["password_hash"]):
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Invalid email or password.")
 
